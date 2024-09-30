@@ -1,0 +1,46 @@
+[build-system]
+requires = [ "poetry-core",]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry]
+name = "test"
+version = "0.1.0"
+description = "A FastAPI backend for a text-based game"
+authors = [ "Skyler Saville <skylersaville@gmail.com>",]
+readme = "README.md"
+license = "MIT"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+requests = "^2.32.3"
+python-dotenv = "^1.0.1"
+packaging = "^24.1"
+pydantic-settings = "^2.5.2"
+email-validator = "^2.2.0"
+python-multipart = "^0.0.12"
+
+
+[tool.poetry.group.dev.dependencies]
+black = "^24.8.0"
+isort = "^5.13.2"
+flake8 = "^7.1.1"
+pylint = "^3.2.7"
+pytest = "^8.3.3"
+pytest-cov = "^5.0.0"
+mypy = "^1.11.2"
+bandit = "^1.7.9"
+safety = "^3.2.7"
+coverage = "^7.6.1"
+toml = "^0.10.2"
+
+[tool.poetry.group.sql-common.dependencies]
+sqlalchemy = "^2.0.35"
+sqlalchemy-utils = "^0.41.2"
+sqlite-utils = "^3.37"
+databases = "^0.9.0"
+aiosqlite = "^0.20.0"
+sqlmodel = "^0.0.22"
+
+[tool.poetry.group.rest.dependencies]
+fastapi = "^0.115.0"
+uvicorn = "^0.30.6"
