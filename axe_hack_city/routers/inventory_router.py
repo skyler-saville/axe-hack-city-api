@@ -1,7 +1,15 @@
+# routers/inventory_router.py
+from typing import Any, Dict, List
+
 from fastapi import APIRouter
-from typing import List, Dict, Any
+
+from ..controllers.inventory_controller import InventoryController
+from ..models.inventory_model import Inventory
+from ..schemas.inventory_schema import (InventoryCreateSchema, InventorySchema,
+                                        InventoryUpdateSchema)
 
 router = APIRouter()
+
 
 @router.post("/", response_model=Dict[str, Any])
 def create_inventory(inventory_data: Dict[str, Any]) -> Dict[str, Any]:
@@ -13,7 +21,12 @@ def create_inventory(inventory_data: Dict[str, Any]) -> Dict[str, Any]:
     Returns:
         The created inventory item data.
     """
-    return {"id": 1, "name": inventory_data.get("name"), "quantity": inventory_data.get("quantity")}
+    return {
+        "id": 1,
+        "name": inventory_data.get("name"),
+        "quantity": inventory_data.get("quantity"),
+    }
+
 
 @router.get("/{inventory_id}", response_model=Dict[str, Any])
 def get_inventory(inventory_id: int) -> Dict[str, Any]:
@@ -27,8 +40,11 @@ def get_inventory(inventory_id: int) -> Dict[str, Any]:
     """
     return {"id": inventory_id, "name": "Sample Item", "quantity": 100}
 
+
 @router.put("/{inventory_id}", response_model=Dict[str, Any])
-def update_inventory(inventory_id: int, inventory_data: Dict[str, Any]) -> Dict[str, Any]:
+def update_inventory(
+    inventory_id: int, inventory_data: Dict[str, Any]
+) -> Dict[str, Any]:
     """Update an inventory item by ID.
 
     Args:
@@ -38,7 +54,12 @@ def update_inventory(inventory_id: int, inventory_data: Dict[str, Any]) -> Dict[
     Returns:
         The updated inventory item data.
     """
-    return {"id": inventory_id, "name": inventory_data.get("name"), "quantity": inventory_data.get("quantity")}
+    return {
+        "id": inventory_id,
+        "name": inventory_data.get("name"),
+        "quantity": inventory_data.get("quantity"),
+    }
+
 
 @router.delete("/{inventory_id}", response_model=Dict[str, Any])
 def delete_inventory(inventory_id: int) -> Dict[str, Any]:
@@ -51,6 +72,7 @@ def delete_inventory(inventory_id: int) -> Dict[str, Any]:
         A message confirming the successful deletion of the inventory item.
     """
     return {"detail": "Inventory deleted successfully"}
+
 
 @router.get("/", response_model=List[Dict[str, Any]])
 def list_inventories() -> List[Dict[str, Any]]:

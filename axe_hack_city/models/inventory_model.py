@@ -1,9 +1,12 @@
-from sqlalchemy import Column, Integer, Float, ForeignKey
-from sqlalchemy.orm import relationship
+# models/inventory_model.py
+from sqlalchemy import Column, Float, ForeignKey, Integer
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import relationship
+
 from .item_model import Item
 
 Base = declarative_base()
+
 
 class Inventory(Base):
     """Represents an inventory for a character.
@@ -13,7 +16,8 @@ class Inventory(Base):
         max_capacity (int): Maximum capacity of the inventory.
         current_weight (float): Current weight of items in the inventory.
     """
-    __tablename__ = 'inventories'
+
+    __tablename__ = "inventories"
 
     id: int = Column(Integer, primary_key=True, index=True)
     max_capacity: int = Column(Integer)
@@ -21,7 +25,7 @@ class Inventory(Base):
 
     items = relationship("Item", back_populates="inventory")
 
-    def add_item(self, item: 'Item') -> None:
+    def add_item(self, item: "Item") -> None:
         """Adds an item to the inventory.
 
         Args:
@@ -34,7 +38,7 @@ class Inventory(Base):
             # Handle inventory full scenario
             pass
 
-    def remove_item(self, item: 'Item') -> None:
+    def remove_item(self, item: "Item") -> None:
         """Removes an item from the inventory.
 
         Args:

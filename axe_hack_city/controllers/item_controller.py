@@ -1,12 +1,15 @@
 # controllers/item_controller.py
 from typing import List
+
 from sqlalchemy.orm import Session
+
 from ..database.sqlalchemy_repository import SQLAlchemyRepository
 from ..models.item_model import Item
 
+
 class ItemController:
     """Controller for managing Item entities."""
-    
+
     def __init__(self, session: Session):
         """Initialize the ItemController.
 

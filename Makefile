@@ -15,8 +15,15 @@ sync:
 	@python bin/package_sync.py
 
 freeze:
-	@poetry export -f requirements.txt --output requirements.txt
-	@poetry export -f requirements.txt --output .dev-requirements.txt --with-dev-dependencies
+	@if [ -f requirements.txt ]; then rm -f requirements.txt; fi
+	@poetry export --without dev --without-hashes -f requirements.txt --output requirements.txt
+	@if [ -f requirements-dev.txt ]; then rm -f dev-requirements.txt; fi
+	@poetry export --only dev --without-hashes -f requirements.txt --output requirements-dev.txt
+
+clean:
+	@if [ -f requirements.txt ]; then rm -f requirements.txt; fi
+	@if [ -f requirements-dev.txt ]; then rm -f requirements-dev.txt; fi
+	@find $(PROJECT_DIR) -name '__pycache__' -exec rm -rf {} \;
 
 dev:
 	PYTHONPATH=$(CURDIR) uvicorn $(PROJECT_NAME).main:app --host 0.0.0.0 --port 8000 --reload
@@ -43,3 +50,24 @@ docker-remove:
 
 docker-delete:
 	./bin/env_utils.sh delete
+
+PROJECT_DIR := $(CURDIR)/axe_hack_city
+PYTHON_FILES := $(shell find $(PROJECT_DIR) -name '*.py')
+
+sort:
+	isort $(PYTHON_FILES)
+
+format:
+	black $(PYTHON_FILES)
+
+lint:
+	pylint $(PYTHON_FILES)
+
+
+add_imports:
+	./bin/add_imports.sh $(PROJECT_DIR)
+
+comment:
+	./bin/add_filename_comment.sh $(PROJECT_DIR)
+
+

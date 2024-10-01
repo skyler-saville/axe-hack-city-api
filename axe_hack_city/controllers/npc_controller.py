@@ -1,12 +1,15 @@
 # controllers/npc_controller.py
 from typing import List
+
 from sqlalchemy.orm import Session
+
 from ..database.sqlalchemy_repository import SQLAlchemyRepository
 from ..models.npc_model import NPC
 
+
 class NPCController:
     """Controller for managing NPC entities."""
-    
+
     def __init__(self, session: Session):
         """Initialize the NPCController.
 

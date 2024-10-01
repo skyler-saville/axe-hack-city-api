@@ -1,16 +1,21 @@
-from sqlalchemy import Column, Integer, String, Enum, ARRAY
+# models/user_model.py
 from enum import Enum as PyEnum
+
+from sqlalchemy import ARRAY, Column, Enum, Integer, String
 from sqlalchemy.ext.declarative import declarative_base
 
 Base = declarative_base()
 
+
 class TimezoneEnum(str, PyEnum):
     """Enumeration of possible time zones."""
+
     UTC = "UTC"
     EST = "EST"
     PST = "PST"
     CST = "CST"
     MST = "MST"
+
 
 class User(Base):
     """Represents a user in the game.
@@ -22,7 +27,8 @@ class User(Base):
         timezone (TimezoneEnum): Timezone of the user.
         character_ids (list[int]): List of associated character IDs.
     """
-    __tablename__ = 'users'
+
+    __tablename__ = "users"
 
     id: int = Column(Integer, primary_key=True, index=True)
     username: str = Column(String, unique=True, index=True)

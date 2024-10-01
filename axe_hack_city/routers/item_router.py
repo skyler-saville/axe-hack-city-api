@@ -1,7 +1,15 @@
+# routers/item_router.py
+from typing import Any, Dict, List
+
 from fastapi import APIRouter
-from typing import List, Dict, Any
+
+from ..controllers.item_controller import ItemController
+from ..models.item_model import Item
+from ..schemas.item_schema import (ItemCreateSchema, ItemSchema,
+                                   ItemUpdateSchema)
 
 router = APIRouter()
+
 
 @router.post("/", response_model=Dict[str, Any])
 def create_item(item: Dict[str, Any]) -> Dict[str, Any]:
@@ -15,6 +23,7 @@ def create_item(item: Dict[str, Any]) -> Dict[str, Any]:
     """
     return {"id": 1, "name": item.get("name"), "description": item.get("description")}
 
+
 @router.get("/{item_id}", response_model=Dict[str, Any])
 def get_item(item_id: int) -> Dict[str, Any]:
     """Retrieve an item by ID.
@@ -27,6 +36,7 @@ def get_item(item_id: int) -> Dict[str, Any]:
     """
     return {"id": item_id, "name": "Sample Item", "description": "Sample description"}
 
+
 @router.put("/{item_id}", response_model=Dict[str, Any])
 def update_item(item_id: int, item: Dict[str, Any]) -> Dict[str, Any]:
     """Update an item by ID.
@@ -38,7 +48,12 @@ def update_item(item_id: int, item: Dict[str, Any]) -> Dict[str, Any]:
     Returns:
         The updated item data.
     """
-    return {"id": item_id, "name": item.get("name"), "description": item.get("description")}
+    return {
+        "id": item_id,
+        "name": item.get("name"),
+        "description": item.get("description"),
+    }
+
 
 @router.delete("/{item_id}", response_model=Dict[str, Any])
 def delete_item(item_id: int) -> Dict[str, Any]:
@@ -51,6 +66,7 @@ def delete_item(item_id: int) -> Dict[str, Any]:
         A message confirming the successful deletion of the item.
     """
     return {"detail": "Item deleted successfully"}
+
 
 @router.get("/", response_model=List[Dict[str, Any]])
 def list_items() -> List[Dict[str, Any]]:

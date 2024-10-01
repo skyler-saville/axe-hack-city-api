@@ -1,7 +1,16 @@
+# routers/progression_router.py
+from typing import Any, Dict, List
+
 from fastapi import APIRouter
-from typing import List, Dict, Any
+
+from ..controllers.progression_controller import ProgressionController
+from ..models.progression_model import Progression
+from ..schemas.progression_schema import (ProgressionCreateSchema,
+                                          ProgressionSchema,
+                                          ProgressionUpdateSchema)
 
 router = APIRouter()
+
 
 @router.post("/", response_model=Dict[str, Any])
 def create_progression(progression: Dict[str, Any]) -> Dict[str, Any]:
@@ -15,6 +24,7 @@ def create_progression(progression: Dict[str, Any]) -> Dict[str, Any]:
     """
     return {"id": 1, "character_id": progression.get("character_id")}
 
+
 @router.get("/{progression_id}", response_model=Dict[str, Any])
 def read_progression(progression_id: int) -> Dict[str, Any]:
     """Retrieve a progression by ID.
@@ -27,8 +37,11 @@ def read_progression(progression_id: int) -> Dict[str, Any]:
     """
     return {"id": progression_id, "character_id": 1}
 
+
 @router.put("/{progression_id}", response_model=Dict[str, Any])
-def update_progression(progression_id: int, progression: Dict[str, Any]) -> Dict[str, Any]:
+def update_progression(
+    progression_id: int, progression: Dict[str, Any]
+) -> Dict[str, Any]:
     """Update a progression by ID.
 
     Args:
@@ -39,6 +52,7 @@ def update_progression(progression_id: int, progression: Dict[str, Any]) -> Dict
         The updated progression data.
     """
     return {"id": progression_id, "character_id": progression.get("character_id")}
+
 
 @router.delete("/{progression_id}", response_model=Dict[str, Any])
 def delete_progression(progression_id: int) -> Dict[str, Any]:
@@ -51,6 +65,7 @@ def delete_progression(progression_id: int) -> Dict[str, Any]:
         A message confirming the successful deletion of the progression.
     """
     return {"detail": "Progression deleted successfully"}
+
 
 @router.get("/", response_model=List[Dict[str, Any]])
 def list_progressions() -> List[Dict[str, Any]]:

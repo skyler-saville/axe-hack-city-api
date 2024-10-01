@@ -1,12 +1,15 @@
 # controllers/character_controller.py
 from typing import List
+
 from sqlalchemy.orm import Session
+
 from ..database.sqlalchemy_repository import SQLAlchemyRepository
 from ..models.character_model import Character
 
+
 class CharacterController:
     """Controller for managing Character entities."""
-    
+
     def __init__(self, session: Session):
         """Initialize the CharacterController.
 

@@ -1,11 +1,19 @@
+# routers/user_router.py
+from typing import Any, Dict, List
+
 from fastapi import APIRouter, HTTPException
-from typing import List, Dict, Any
+
+from ..controllers.user_controller import UserController
+from ..models.user_model import User
+from ..schemas.user_schema import (UserCreateSchema, UserSchema,
+                                   UserUpdateSchema)
 
 router = APIRouter()
 
 # In-memory storage for demonstration purposes
 fake_users_db: Dict[int, Dict[str, Any]] = {}
 user_id_counter = 1
+
 
 @router.post("/", response_model=Dict[str, Any])
 def create_user(user: Dict[str, Any]) -> Dict[str, Any]:
@@ -22,13 +30,14 @@ def create_user(user: Dict[str, Any]) -> Dict[str, Any]:
     """
     global user_id_counter
     for existing_user in fake_users_db.values():
-        if existing_user['username'] == user['username']:
+        if existing_user["username"] == user["username"]:
             raise HTTPException(status_code=400, detail="Username already exists")
-    
+
     user_id = user_id_counter
     fake_users_db[user_id] = {**user, "id": user_id}
     user_id_counter += 1
     return fake_users_db[user_id]
+
 
 @router.get("/{user_id}", response_model=Dict[str, Any])
 def read_user(user_id: int) -> Dict[str, Any]:
@@ -47,6 +56,7 @@ def read_user(user_id: int) -> Dict[str, Any]:
     if user is None:
         raise HTTPException(status_code=404, detail="User not found")
     return user
+
 
 @router.put("/{user_id}", response_model=Dict[str, Any])
 def update_user(user_id: int, user: Dict[str, Any]) -> Dict[str, Any]:
@@ -68,6 +78,7 @@ def update_user(user_id: int, user: Dict[str, Any]) -> Dict[str, Any]:
     fake_users_db[user_id].update(user)
     return fake_users_db[user_id]
 
+
 @router.delete("/{user_id}", response_model=dict)
 def delete_user(user_id: int) -> Dict[str, str]:
     """Delete a user by their ID.
@@ -83,9 +94,10 @@ def delete_user(user_id: int) -> Dict[str, str]:
     """
     if user_id not in fake_users_db:
         raise HTTPException(status_code=404, detail="User not found")
-    
+
     del fake_users_db[user_id]
     return {"detail": "User deleted successfully"}
+
 
 @router.get("/", response_model=List[Dict[str, Any]])
 def list_users() -> List[Dict[str, Any]]:

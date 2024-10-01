@@ -1,7 +1,15 @@
+# routers/building_router.py
+from typing import Any, Dict, List
+
 from fastapi import APIRouter
-from typing import List, Dict, Any
+
+from ..controllers.building_controller import BuildingController
+from ..models.building_model import Building
+from ..schemas.building_schema import (BuildingCreateSchema, BuildingSchema,
+                                       BuildingUpdateSchema)
 
 router = APIRouter()
+
 
 @router.post("/", response_model=Dict[str, Any])
 def create_building(building: Dict[str, Any]) -> Dict[str, Any]:
@@ -15,6 +23,7 @@ def create_building(building: Dict[str, Any]) -> Dict[str, Any]:
     """
     return {"message": "Building created", "data": building}
 
+
 @router.get("/{building_id}", response_model=Dict[str, Any])
 def get_building(building_id: int) -> Dict[str, Any]:
     """Retrieve a building by ID.
@@ -26,6 +35,7 @@ def get_building(building_id: int) -> Dict[str, Any]:
         A message confirming the building retrieval along with the building ID.
     """
     return {"message": "Building retrieved", "building_id": building_id}
+
 
 @router.put("/{building_id}", response_model=Dict[str, Any])
 def update_building(building_id: int, building: Dict[str, Any]) -> Dict[str, Any]:
@@ -40,6 +50,7 @@ def update_building(building_id: int, building: Dict[str, Any]) -> Dict[str, Any
     """
     return {"message": "Building updated", "building_id": building_id, "data": building}
 
+
 @router.delete("/{building_id}", response_model=Dict[str, Any])
 def delete_building(building_id: int) -> Dict[str, Any]:
     """Delete a building by ID.
@@ -52,6 +63,7 @@ def delete_building(building_id: int) -> Dict[str, Any]:
     """
     return {"message": "Building deleted successfully", "building_id": building_id}
 
+
 @router.get("/", response_model=List[Dict[str, Any]])
 def list_buildings() -> List[Dict[str, Any]]:
     """List all buildings.
@@ -59,4 +71,7 @@ def list_buildings() -> List[Dict[str, Any]]:
     Returns:
         A list of buildings with their IDs and names.
     """
-    return [{"building_id": 1, "name": "Building A"}, {"building_id": 2, "name": "Building B"}]
+    return [
+        {"building_id": 1, "name": "Building A"},
+        {"building_id": 2, "name": "Building B"},
+    ]

@@ -1,12 +1,15 @@
 # controllers/skill_controller.py
 from typing import List
+
 from sqlalchemy.orm import Session
+
 from ..database.sqlalchemy_repository import SQLAlchemyRepository
 from ..models.skill_model import Skill
 
+
 class SkillController:
     """Controller for managing Skill entities."""
-    
+
     def __init__(self, session: Session):
         """Initialize the SkillController.
 

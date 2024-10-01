@@ -1,12 +1,15 @@
 # controllers/inventory_controller.py
 from typing import List
+
 from sqlalchemy.orm import Session
+
 from ..database.sqlalchemy_repository import SQLAlchemyRepository
 from ..models.inventory_model import Inventory
 
+
 class InventoryController:
     """Controller for managing Inventory entities."""
-    
+
     def __init__(self, session: Session):
         """Initialize the InventoryController.
 

@@ -1,12 +1,16 @@
+# controllers/event_controller.py
 # controllers/events_controller.py
 from typing import List
+
 from sqlalchemy.orm import Session
+
 from ..database.sqlalchemy_repository import SQLAlchemyRepository
 from ..models.event_model import Event
 
+
 class EventsController:
     """Controller for managing Event entities."""
-    
+
     def __init__(self, session: Session):
         """Initialize the EventsController.
 

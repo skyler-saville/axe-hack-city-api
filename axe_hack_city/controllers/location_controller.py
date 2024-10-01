@@ -1,12 +1,15 @@
 # controllers/location_controller.py
 from typing import List
+
 from sqlalchemy.orm import Session
+
 from ..database.sqlalchemy_repository import SQLAlchemyRepository
 from ..models.location_model import Location
 
+
 class LocationController:
     """Controller for managing Location entities."""
-    
+
     def __init__(self, session: Session):
         """Initialize the LocationController.
 

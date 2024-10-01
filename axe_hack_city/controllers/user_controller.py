@@ -1,12 +1,15 @@
 # controllers/user_controller.py
 from typing import List
+
 from sqlalchemy.orm import Session
+
 from ..database.sqlalchemy_repository import SQLAlchemyRepository
 from ..models.user_model import User
 
+
 class UserController:
     """Controller for managing User entities."""
-    
+
     def __init__(self, session: Session):
         """Initialize the UserController.
 

@@ -1,8 +1,10 @@
-from sqlalchemy import Column, Integer, ForeignKey, JSON
-from sqlalchemy.orm import relationship
+# models/progression_model.py
+from sqlalchemy import JSON, Column, ForeignKey, Integer
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import relationship
 
 Base = declarative_base()
+
 
 class PlayerProgression(Base):
     """Represents player progression in the game.
@@ -14,10 +16,11 @@ class PlayerProgression(Base):
         faction_reputations (dict): Faction reputations.
         achievements (list): List of achievements.
     """
-    __tablename__ = 'player_progressions'
+
+    __tablename__ = "player_progressions"
 
     id: int = Column(Integer, primary_key=True, index=True)
-    character_id: int = Column(Integer, ForeignKey('characters.id'))
+    character_id: int = Column(Integer, ForeignKey("characters.id"))
     missions_completed: dict = Column(JSON)
     faction_reputations: dict = Column(JSON)
     achievements: list = Column(JSON)

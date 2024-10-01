@@ -1,12 +1,15 @@
 # controllers/mission_controller.py
 from typing import List
+
 from sqlalchemy.orm import Session
+
 from ..database.sqlalchemy_repository import SQLAlchemyRepository
 from ..models.mission_model import Mission
 
+
 class MissionController:
     """Controller for managing Mission entities."""
-    
+
     def __init__(self, session: Session):
         """Initialize the MissionController.
 

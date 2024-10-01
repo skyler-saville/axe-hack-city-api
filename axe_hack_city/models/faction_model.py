@@ -1,8 +1,10 @@
+# models/faction_model.py
 from sqlalchemy import Column, Integer, String
-from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import relationship
 
 Base = declarative_base()
+
 
 class Faction(Base):
     """Represents a faction in the game.
@@ -13,7 +15,8 @@ class Faction(Base):
         description (str): Description of the faction.
         reputation (int): Reputation score of the faction.
     """
-    __tablename__ = 'factions'
+
+    __tablename__ = "factions"
 
     id: int = Column(Integer, primary_key=True, index=True)
     name: str = Column(String)

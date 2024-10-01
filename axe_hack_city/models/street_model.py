@@ -1,8 +1,10 @@
-from sqlalchemy import Column, Integer, Float, ForeignKey
-from sqlalchemy.orm import relationship
+# models/street_model.py
+from sqlalchemy import Column, Float, ForeignKey, Integer
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import relationship
 
 Base = declarative_base()
+
 
 class Street(Base):
     """Represents a street in the game.
@@ -13,7 +15,8 @@ class Street(Base):
         length (float): Length of the street.
         traffic (int): Traffic level on the street.
     """
-    __tablename__ = 'streets'
+
+    __tablename__ = "streets"
 
     id: int = Column(Integer, primary_key=True, index=True)
     width: float = Column(Float)

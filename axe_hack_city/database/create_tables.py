@@ -1,8 +1,10 @@
-import sqlite3
 import json
+import sqlite3
+
 
 def create_building_table(cursor: sqlite3.Cursor):
-    cursor.execute('''
+    cursor.execute(
+        """
     CREATE TABLE IF NOT EXISTS Building (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT NOT NULL,
@@ -11,10 +13,13 @@ def create_building_table(cursor: sqlite3.Cursor):
         coordinates TEXT, -- JSON string (tuple of floats)
         connected_locations TEXT -- JSON string (list of Location IDs)
     );
-    ''')
+    """
+    )
+
 
 def create_floor_table(cursor: sqlite3.Cursor):
-    cursor.execute('''
+    cursor.execute(
+        """
     CREATE TABLE IF NOT EXISTS Floor (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         number INTEGER NOT NULL,
@@ -22,10 +27,13 @@ def create_floor_table(cursor: sqlite3.Cursor):
         building_id INTEGER NOT NULL, -- Foreign key to Building
         FOREIGN KEY (building_id) REFERENCES Building(id)
     );
-    ''')
+    """
+    )
+
 
 def create_item_table(cursor: sqlite3.Cursor):
-    cursor.execute('''
+    cursor.execute(
+        """
     CREATE TABLE IF NOT EXISTS Item (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT NOT NULL,
@@ -39,10 +47,13 @@ def create_item_table(cursor: sqlite3.Cursor):
         defense INTEGER NOT NULL,
         effects TEXT -- JSON string (dict of effects)
     );
-    ''')
+    """
+    )
+
 
 def create_npc_table(cursor: sqlite3.Cursor):
-    cursor.execute('''
+    cursor.execute(
+        """
     CREATE TABLE IF NOT EXISTS NPC (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT NOT NULL,
@@ -54,10 +65,13 @@ def create_npc_table(cursor: sqlite3.Cursor):
         aggression_level TEXT, -- Enum AggressionLevel
         relationship TEXT -- Enum Relationship
     );
-    ''')
+    """
+    )
+
 
 def create_character_table(cursor: sqlite3.Cursor):
-    cursor.execute('''
+    cursor.execute(
+        """
     CREATE TABLE IF NOT EXISTS Character (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT NOT NULL,
@@ -69,20 +83,26 @@ def create_character_table(cursor: sqlite3.Cursor):
         inventory_id INTEGER, -- Foreign key to Inventory
         FOREIGN KEY (inventory_id) REFERENCES Inventory(id)
     );
-    ''')
+    """
+    )
+
 
 def create_inventory_table(cursor: sqlite3.Cursor):
-    cursor.execute('''
+    cursor.execute(
+        """
     CREATE TABLE IF NOT EXISTS Inventory (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         items TEXT, -- JSON string (list of item IDs)
         max_capacity INTEGER NOT NULL,
         current_weight REAL NOT NULL
     );
-    ''')
+    """
+    )
+
 
 def create_crafting_table(cursor: sqlite3.Cursor):
-    cursor.execute('''
+    cursor.execute(
+        """
     CREATE TABLE IF NOT EXISTS CraftingRecipe (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT NOT NULL,
@@ -92,10 +112,13 @@ def create_crafting_table(cursor: sqlite3.Cursor):
         skill_required TEXT, -- Foreign key to Skill (name)
         FOREIGN KEY (output_id) REFERENCES Item(id)
     );
-    ''')
+    """
+    )
+
 
 def create_event_table(cursor: sqlite3.Cursor):
-    cursor.execute('''
+    cursor.execute(
+        """
     CREATE TABLE IF NOT EXISTS Event (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT NOT NULL,
@@ -106,10 +129,13 @@ def create_event_table(cursor: sqlite3.Cursor):
         participants TEXT, -- JSON string (list of character IDs)
         FOREIGN KEY (location_id) REFERENCES Location(id)
     );
-    ''')
+    """
+    )
+
 
 def create_faction_table(cursor: sqlite3.Cursor):
-    cursor.execute('''
+    cursor.execute(
+        """
     CREATE TABLE IF NOT EXISTS Faction (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT NOT NULL,
@@ -119,19 +145,25 @@ def create_faction_table(cursor: sqlite3.Cursor):
         enemies TEXT, -- JSON string (list of faction IDs)
         npcs TEXT -- JSON string (list of NPC IDs)
     );
-    ''')
+    """
+    )
+
 
 def create_floor_layout_table(cursor: sqlite3.Cursor):
-    cursor.execute('''
+    cursor.execute(
+        """
     CREATE TABLE IF NOT EXISTS FloorLayout (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         walls TEXT, -- JSON string (list of Wall tuples)
         doors TEXT -- JSON string (list of Door objects)
     );
-    ''')
+    """
+    )
+
 
 def create_location_table(cursor: sqlite3.Cursor):
-    cursor.execute('''
+    cursor.execute(
+        """
     CREATE TABLE IF NOT EXISTS Location (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT NOT NULL,
@@ -140,10 +172,13 @@ def create_location_table(cursor: sqlite3.Cursor):
         coordinates TEXT, -- JSON string (tuple of floats)
         connected_locations TEXT -- JSON string (list of Location IDs)
     );
-    ''')
+    """
+    )
+
 
 def create_mission_table(cursor: sqlite3.Cursor):
-    cursor.execute('''
+    cursor.execute(
+        """
     CREATE TABLE IF NOT EXISTS Mission (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT NOT NULL,
@@ -154,10 +189,13 @@ def create_mission_table(cursor: sqlite3.Cursor):
         status TEXT NOT NULL, -- Enum MissionStatus
         FOREIGN KEY (giver_id) REFERENCES NPC(id)
     );
-    ''')
+    """
+    )
+
 
 def create_progression_table(cursor: sqlite3.Cursor):
-    cursor.execute('''
+    cursor.execute(
+        """
     CREATE TABLE IF NOT EXISTS PlayerProgression (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         character_id INTEGER NOT NULL, -- Foreign key to Character
@@ -166,10 +204,13 @@ def create_progression_table(cursor: sqlite3.Cursor):
         achievements TEXT, -- JSON string (list of achievements)
         FOREIGN KEY (character_id) REFERENCES Character(id)
     );
-    ''')
+    """
+    )
+
 
 def create_skill_table(cursor: sqlite3.Cursor):
-    cursor.execute('''
+    cursor.execute(
+        """
     CREATE TABLE IF NOT EXISTS Skill (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT NOT NULL,
@@ -179,10 +220,13 @@ def create_skill_table(cursor: sqlite3.Cursor):
         prerequisites TEXT, -- JSON string (list of prerequisite skill names)
         effects TEXT -- JSON string (dict of effects)
     );
-    ''')
+    """
+    )
+
 
 def create_user_table(cursor: sqlite3.Cursor):
-    cursor.execute('''
+    cursor.execute(
+        """
     CREATE TABLE IF NOT EXISTS User (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         username TEXT NOT NULL UNIQUE,
@@ -190,10 +234,13 @@ def create_user_table(cursor: sqlite3.Cursor):
         timezone TEXT NOT NULL,
         character_ids TEXT -- JSON string (list of character IDs)
     );
-    ''')
+    """
+    )
+
 
 def create_street_table(cursor: sqlite3.Cursor):
-    cursor.execute('''
+    cursor.execute(
+        """
     CREATE TABLE IF NOT EXISTS Street (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT NOT NULL,
@@ -205,7 +252,9 @@ def create_street_table(cursor: sqlite3.Cursor):
         length REAL NOT NULL,
         traffic INTEGER NOT NULL
     );
-    ''')
+    """
+    )
+
 
 def create_tables(connection: sqlite3.Connection):
     cursor = connection.cursor()
@@ -226,4 +275,3 @@ def create_tables(connection: sqlite3.Connection):
     create_user_table(cursor)
     create_street_table(cursor)
     connection.commit()
-

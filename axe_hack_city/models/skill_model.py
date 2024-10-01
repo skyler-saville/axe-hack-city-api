@@ -1,11 +1,15 @@
-from sqlalchemy import Column, Integer, String, Enum, JSON
+# models/skill_model.py
 from enum import Enum as PyEnum
+
+from sqlalchemy import JSON, Column, Enum, Integer, String
 from sqlalchemy.ext.declarative import declarative_base
 
 Base = declarative_base()
 
+
 class SkillType(str, PyEnum):
     """Enumeration of possible skill types."""
+
     hacking = "hacking"
     engineering = "engineering"
     demolitions = "demolitions"
@@ -13,6 +17,7 @@ class SkillType(str, PyEnum):
     strategy = "strategy"
     medical = "medical"
     reconnaissance = "reconnaissance"
+
 
 class Skill(Base):
     """Represents a skill in the game.
@@ -26,7 +31,8 @@ class Skill(Base):
         prerequisites (list): Prerequisite skills.
         effects (dict): Effects of the skill.
     """
-    __tablename__ = 'skills'
+
+    __tablename__ = "skills"
 
     id: int = Column(Integer, primary_key=True, index=True)
     name: str = Column(String)

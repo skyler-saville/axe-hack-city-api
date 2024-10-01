@@ -1,7 +1,15 @@
+# routers/character_router.py
+from typing import Any, Dict, List
+
 from fastapi import APIRouter
-from typing import List, Dict, Any
+
+from ..controllers.character_controller import CharacterController
+from ..models.character_model import Character
+from ..schemas.character_schema import (CharacterCreateSchema, CharacterSchema,
+                                        CharacterUpdateSchema)
 
 router = APIRouter()
+
 
 @router.post("/", response_model=Dict[str, Any])
 def create_character(character: Dict[str, Any]) -> Dict[str, Any]:
@@ -15,6 +23,7 @@ def create_character(character: Dict[str, Any]) -> Dict[str, Any]:
     """
     return {"message": "Character created", "data": character}
 
+
 @router.get("/{character_id}", response_model=Dict[str, Any])
 def get_character(character_id: int) -> Dict[str, Any]:
     """Retrieve a character by ID.
@@ -27,6 +36,7 @@ def get_character(character_id: int) -> Dict[str, Any]:
     """
     return {"message": "Character retrieved", "character_id": character_id}
 
+
 @router.put("/{character_id}", response_model=Dict[str, Any])
 def update_character(character_id: int, character: Dict[str, Any]) -> Dict[str, Any]:
     """Update a character by ID.
@@ -38,7 +48,12 @@ def update_character(character_id: int, character: Dict[str, Any]) -> Dict[str, 
     Returns:
         A message confirming the character update along with the character data.
     """
-    return {"message": "Character updated", "character_id": character_id, "data": character}
+    return {
+        "message": "Character updated",
+        "character_id": character_id,
+        "data": character,
+    }
+
 
 @router.delete("/{character_id}", response_model=Dict[str, Any])
 def delete_character(character_id: int) -> Dict[str, Any]:
@@ -52,6 +67,7 @@ def delete_character(character_id: int) -> Dict[str, Any]:
     """
     return {"message": "Character deleted successfully", "character_id": character_id}
 
+
 @router.get("/", response_model=List[Dict[str, Any]])
 def list_characters() -> List[Dict[str, Any]]:
     """List all characters.
@@ -59,4 +75,7 @@ def list_characters() -> List[Dict[str, Any]]:
     Returns:
         A list of characters with their IDs and names.
     """
-    return [{"character_id": 1, "name": "Character A"}, {"character_id": 2, "name": "Character B"}]
+    return [
+        {"character_id": 1, "name": "Character A"},
+        {"character_id": 2, "name": "Character B"},
+    ]

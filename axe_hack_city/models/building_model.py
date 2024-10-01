@@ -1,8 +1,10 @@
+# models/building_model.py
 from sqlalchemy import Column, Integer, String
-from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import relationship
 
 Base = declarative_base()
+
 
 class Building(Base):
     """Represents a building in the game.
@@ -13,7 +15,8 @@ class Building(Base):
         type (str): Type of the building.
         description (str): Description of the building.
     """
-    __tablename__ = 'buildings'
+
+    __tablename__ = "buildings"
 
     id: int = Column(Integer, primary_key=True, index=True)
     name: str = Column(String)

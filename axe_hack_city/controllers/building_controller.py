@@ -1,12 +1,15 @@
 # controllers/building_controller.py
 from typing import List
+
 from sqlalchemy.orm import Session
+
 from ..database.sqlalchemy_repository import SQLAlchemyRepository
 from ..models.building_model import Building
 
+
 class BuildingController:
     """Controller for managing Building entities."""
-    
+
     def __init__(self, session: Session):
         """Initialize the BuildingController.
 

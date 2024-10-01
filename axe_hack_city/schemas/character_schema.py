@@ -1,11 +1,13 @@
 # schemas/character_schema.py
 from typing import List, Optional
-from sqlmodel import SQLModel, Field
+
 from pydantic import model_validator
+from sqlmodel import Field, SQLModel
+
 
 class CharacterSchema(SQLModel, table=True):
     """Schema for representing a character."""
-    
+
     id: int = Field(default=None, primary_key=True)
     name: str
     health: int
@@ -15,9 +17,10 @@ class CharacterSchema(SQLModel, table=True):
     skill_tree_id: int
     inventory_id: int
 
+
 class CharacterCreateSchema(SQLModel):
     """Schema for creating a new character."""
-    
+
     name: str
     health: int
     xp: int
@@ -26,9 +29,10 @@ class CharacterCreateSchema(SQLModel):
     skill_tree_id: int
     inventory_id: int
 
+
 class CharacterUpdateSchema(SQLModel):
     """Schema for updating an existing character."""
-    
+
     name: Optional[str] = None
     health: Optional[int] = None
     xp: Optional[int] = None
@@ -37,11 +41,11 @@ class CharacterUpdateSchema(SQLModel):
     skill_tree_id: Optional[int] = None
     inventory_id: Optional[int] = None
 
-    @model_validator(mode='after')
+    @model_validator(mode="after")
     def validate_health(cls, values: dict) -> dict:
         """Ensure health is non-negative."""
-        
-        health = values.get('health')
+
+        health = values.get("health")
         if health is not None and health < 0:
-            raise ValueError('Health must be non-negative.')
+            raise ValueError("Health must be non-negative.")
         return values

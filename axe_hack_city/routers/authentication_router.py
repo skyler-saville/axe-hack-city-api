@@ -1,5 +1,6 @@
 # routers/authentication_router.py
-from typing import Optional, Dict
+from typing import Dict, Optional
+
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from pydantic import BaseModel
@@ -30,6 +31,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 class User(BaseModel):
     """User model for API responses."""
+
     username: str
     email: Optional[str] = None
     full_name: Optional[str] = None
@@ -38,6 +40,7 @@ class User(BaseModel):
 
 class UserInDB(User):
     """User model with hashed password for database."""
+
     hashed_password: str
 
 
@@ -46,7 +49,9 @@ def fake_hash_password(password: str) -> str:
     return "fakehashed" + password
 
 
-def get_user(db: Dict[str, Dict[str, Optional[str]]], username: str) -> Optional[UserInDB]:
+def get_user(
+    db: Dict[str, Dict[str, Optional[str]]], username: str
+) -> Optional[UserInDB]:
     """Retrieve a user from the database."""
     user_dict = db.get(username)
     if user_dict:
@@ -71,7 +76,9 @@ async def get_current_user(token: str = Depends(oauth2_scheme)) -> UserInDB:
     return user
 
 
-async def get_current_active_user(current_user: User = Depends(get_current_user)) -> User:
+async def get_current_active_user(
+    current_user: User = Depends(get_current_user),
+) -> User:
     """Get the current active user."""
     if current_user.disabled:
         raise HTTPException(status_code=400, detail="Inactive user")

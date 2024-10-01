@@ -1,11 +1,13 @@
 # schemas/npc_schema.py
 from typing import List, Optional
-from sqlmodel import SQLModel, Field
+
 from pydantic import model_validator
+from sqlmodel import Field, SQLModel
+
 
 class NPCSchema(SQLModel, table=True):
     """Schema for representing a non-player character (NPC)."""
-    
+
     id: Optional[int] = Field(default=None, primary_key=True)
     name: str
     health: int
@@ -16,9 +18,10 @@ class NPCSchema(SQLModel, table=True):
     aggression_level: str
     relationship: str
 
+
 class NPCCreateSchema(SQLModel):
     """Schema for creating a new NPC."""
-    
+
     name: str
     health: int
     skill_tree_id: int
@@ -28,20 +31,21 @@ class NPCCreateSchema(SQLModel):
     aggression_level: str
     relationship: str
 
-    @model_validator(mode='after')
+    @model_validator(mode="after")
     def validate_npc(cls, values: dict) -> dict:
         """Validate NPC properties."""
-        
-        health = values.get('health')
+
+        health = values.get("health")
 
         if health is not None and health < 0:
-            raise ValueError('Health must be non-negative.')
+            raise ValueError("Health must be non-negative.")
 
         return values
 
+
 class NPCUpdateSchema(SQLModel):
     """Schema for updating an existing NPC."""
-    
+
     name: Optional[str] = None
     health: Optional[int] = None
     skill_tree_id: Optional[int] = None
@@ -51,9 +55,8 @@ class NPCUpdateSchema(SQLModel):
     aggression_level: Optional[str] = None
     relationship: Optional[str] = None
 
-    @model_validator(mode='after')
+    @model_validator(mode="after")
     def validate_npc(cls, values: dict) -> dict:
         """Validate NPC properties using the create schema's validation."""
-        
-        return NPCCreateSchema.validate_npc(values)
 
+        return NPCCreateSchema.validate_npc(values)

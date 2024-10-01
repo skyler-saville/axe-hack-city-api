@@ -1,7 +1,15 @@
+# routers/floor_router.py
+from typing import Any, Dict, List
+
 from fastapi import APIRouter
-from typing import List, Dict, Any
+
+from ..controllers.floor_controller import FloorController
+from ..models.floor_model import Floor
+from ..schemas.floor_schema import (FloorCreateSchema, FloorSchema,
+                                    FloorUpdateSchema)
 
 router = APIRouter()
+
 
 @router.post("/", response_model=Dict[str, Any])
 def create_floor(floor: Dict[str, Any]) -> Dict[str, Any]:
@@ -15,6 +23,7 @@ def create_floor(floor: Dict[str, Any]) -> Dict[str, Any]:
     """
     return {"message": "Floor created", "data": floor}
 
+
 @router.get("/{floor_id}", response_model=Dict[str, Any])
 def get_floor(floor_id: int) -> Dict[str, Any]:
     """Retrieve a floor by ID.
@@ -26,6 +35,7 @@ def get_floor(floor_id: int) -> Dict[str, Any]:
         A message confirming the floor retrieval along with the floor ID.
     """
     return {"message": "Floor retrieved", "floor_id": floor_id}
+
 
 @router.put("/{floor_id}", response_model=Dict[str, Any])
 def update_floor(floor_id: int, floor: Dict[str, Any]) -> Dict[str, Any]:
@@ -40,6 +50,7 @@ def update_floor(floor_id: int, floor: Dict[str, Any]) -> Dict[str, Any]:
     """
     return {"message": "Floor updated", "floor_id": floor_id, "data": floor}
 
+
 @router.delete("/{floor_id}", response_model=Dict[str, Any])
 def delete_floor(floor_id: int) -> Dict[str, Any]:
     """Delete a floor by ID.
@@ -51,6 +62,7 @@ def delete_floor(floor_id: int) -> Dict[str, Any]:
         A message confirming the successful deletion of the floor.
     """
     return {"message": "Floor deleted successfully", "floor_id": floor_id}
+
 
 @router.get("/", response_model=List[Dict[str, Any]])
 def list_floors() -> List[Dict[str, Any]]:

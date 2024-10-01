@@ -1,7 +1,15 @@
+# routers/event_router.py
+from typing import Any, Dict, List
+
 from fastapi import APIRouter
-from typing import List, Dict, Any
+
+from ..controllers.event_controller import EventController
+from ..models.event_model import Event
+from ..schemas.event_schema import (EventCreateSchema, EventSchema,
+                                    EventUpdateSchema)
 
 router = APIRouter()
+
 
 @router.post("/", response_model=Dict[str, Any])
 def create_event(event: Dict[str, Any]) -> Dict[str, Any]:
@@ -15,6 +23,7 @@ def create_event(event: Dict[str, Any]) -> Dict[str, Any]:
     """
     return {"message": "Event created", "data": event}
 
+
 @router.get("/{event_id}", response_model=Dict[str, Any])
 def read_event(event_id: int) -> Dict[str, Any]:
     """Retrieve an event by ID.
@@ -26,6 +35,7 @@ def read_event(event_id: int) -> Dict[str, Any]:
         A message confirming the event retrieval along with the event ID.
     """
     return {"message": "Event retrieved", "event_id": event_id}
+
 
 @router.put("/{event_id}", response_model=Dict[str, Any])
 def update_event(event_id: int, event: Dict[str, Any]) -> Dict[str, Any]:
@@ -40,6 +50,7 @@ def update_event(event_id: int, event: Dict[str, Any]) -> Dict[str, Any]:
     """
     return {"message": "Event updated", "event_id": event_id, "data": event}
 
+
 @router.delete("/{event_id}", response_model=Dict[str, Any])
 def delete_event(event_id: int) -> Dict[str, Any]:
     """Delete an event by ID.
@@ -51,6 +62,7 @@ def delete_event(event_id: int) -> Dict[str, Any]:
         A message confirming the successful deletion of the event.
     """
     return {"message": "Event deleted successfully", "event_id": event_id}
+
 
 @router.get("/", response_model=List[Dict[str, Any]])
 def list_events() -> List[Dict[str, Any]]:

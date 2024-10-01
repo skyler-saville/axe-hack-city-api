@@ -1,12 +1,15 @@
 # controllers/street_controller.py
 from typing import List
+
 from sqlalchemy.orm import Session
+
 from ..database.sqlalchemy_repository import SQLAlchemyRepository
 from ..models.street_model import Street
 
+
 class StreetController:
     """Controller for managing Street entities."""
-    
+
     def __init__(self, session: Session):
         """Initialize the StreetController.
 

@@ -1,12 +1,15 @@
 # controllers/crafting_controller.py
 from typing import List
+
 from sqlalchemy.orm import Session
+
 from ..database.sqlalchemy_repository import SQLAlchemyRepository
 from ..models.crafting_model import CraftingRecipe as Crafting
 
+
 class CraftingController:
     """Controller for managing Crafting entities."""
-    
+
     def __init__(self, session: Session):
         """Initialize the CraftingController.
 

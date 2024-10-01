@@ -1,10 +1,12 @@
 # database/sqlalchemy_repository.py
-from typing import Type, TypeVar, Generic, List
-from sqlalchemy.orm import Session
+from typing import Generic, List, Type, TypeVar
+
 from sqlalchemy import select
+from sqlalchemy.orm import Session
 
 # Define a generic type T for your SQLAlchemy models
-T = TypeVar('T')
+T = TypeVar("T")
+
 
 class SQLAlchemyRepository(Generic[T]):
     def __init__(self, session: Session, model: Type[T]):

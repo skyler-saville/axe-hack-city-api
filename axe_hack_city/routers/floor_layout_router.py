@@ -1,7 +1,16 @@
+# routers/floor_layout_router.py
+from typing import Any, Dict, List
+
 from fastapi import APIRouter
-from typing import List, Dict, Any
+
+from ..controllers.floor_layout_controller import Floor_layoutController
+from ..models.floor_layout_model import Floor_layout
+from ..schemas.floor_layout_schema import (Floor_layoutCreateSchema,
+                                           Floor_layoutSchema,
+                                           Floor_layoutUpdateSchema)
 
 router = APIRouter()
+
 
 @router.post("/", response_model=Dict[str, Any])
 def create_floor_layout(floor_layout: Dict[str, Any]) -> Dict[str, Any]:
@@ -15,6 +24,7 @@ def create_floor_layout(floor_layout: Dict[str, Any]) -> Dict[str, Any]:
     """
     return {"message": "Floor layout created", "data": floor_layout}
 
+
 @router.get("/{floor_layout_id}", response_model=Dict[str, Any])
 def get_floor_layout(floor_layout_id: int) -> Dict[str, Any]:
     """Retrieve a floor layout by ID.
@@ -27,8 +37,11 @@ def get_floor_layout(floor_layout_id: int) -> Dict[str, Any]:
     """
     return {"message": "Floor layout retrieved", "floor_layout_id": floor_layout_id}
 
+
 @router.put("/{floor_layout_id}", response_model=Dict[str, Any])
-def update_floor_layout(floor_layout_id: int, floor_layout: Dict[str, Any]) -> Dict[str, Any]:
+def update_floor_layout(
+    floor_layout_id: int, floor_layout: Dict[str, Any]
+) -> Dict[str, Any]:
     """Update a floor layout by ID.
 
     Args:
@@ -38,7 +51,12 @@ def update_floor_layout(floor_layout_id: int, floor_layout: Dict[str, Any]) -> D
     Returns:
         A message confirming the floor layout update along with the floor layout data.
     """
-    return {"message": "Floor layout updated", "floor_layout_id": floor_layout_id, "data": floor_layout}
+    return {
+        "message": "Floor layout updated",
+        "floor_layout_id": floor_layout_id,
+        "data": floor_layout,
+    }
+
 
 @router.delete("/{floor_layout_id}", response_model=Dict[str, Any])
 def delete_floor_layout(floor_layout_id: int) -> Dict[str, Any]:
@@ -50,7 +68,11 @@ def delete_floor_layout(floor_layout_id: int) -> Dict[str, Any]:
     Returns:
         A message confirming the successful deletion of the floor layout.
     """
-    return {"message": "Floor layout deleted successfully", "floor_layout_id": floor_layout_id}
+    return {
+        "message": "Floor layout deleted successfully",
+        "floor_layout_id": floor_layout_id,
+    }
+
 
 @router.get("/", response_model=List[Dict[str, Any]])
 def list_floor_layouts() -> List[Dict[str, Any]]:
@@ -59,4 +81,7 @@ def list_floor_layouts() -> List[Dict[str, Any]]:
     Returns:
         A list of floor layouts with their IDs and names.
     """
-    return [{"floor_layout_id": 1, "name": "Floor Layout A"}, {"floor_layout_id": 2, "name": "Floor Layout B"}]
+    return [
+        {"floor_layout_id": 1, "name": "Floor Layout A"},
+        {"floor_layout_id": 2, "name": "Floor Layout B"},
+    ]

@@ -1,12 +1,15 @@
 # controllers/progression_controller.py
 from typing import List
+
 from sqlalchemy.orm import Session
+
 from ..database.sqlalchemy_repository import SQLAlchemyRepository
 from ..models.progression_model import PlayerProgression as Progression
 
+
 class ProgressionController:
     """Controller for managing Progression entities."""
-    
+
     def __init__(self, session: Session):
         """Initialize the ProgressionController.
 
