@@ -1,9 +1,11 @@
 # routers/character_router.py
-from typing import Any, Dict, List
+from typing import List
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends, HTTPException, Response, status
+from sqlalchemy.orm import Session
 
 from ..controllers.character_controller import CharacterController
+from ..database.session import get_session
 from ..models.character_model import Character
 from ..schemas.character_schema import (CharacterCreateSchema, CharacterSchema,
                                         CharacterUpdateSchema)
@@ -11,71 +13,53 @@ from ..schemas.character_schema import (CharacterCreateSchema, CharacterSchema,
 router = APIRouter()
 
 
-@router.post("/", response_model=Dict[str, Any])
-def create_character(character: Dict[str, Any]) -> Dict[str, Any]:
-    """Create a new character.
-
-    Args:
-        character: The character data.
-
-    Returns:
-        A message confirming the character creation along with the character data.
-    """
-    return {"message": "Character created", "data": character}
+@router.post("/", response_model=CharacterSchema)
+def create_character(
+    character: CharacterCreateSchema, db: Session = Depends(get_session)
+) -> Character:
+    controller = CharacterController(db)
+    new_character = Character(**character.model_dump())
+    return controller.create_character(new_character)
 
 
-@router.get("/{character_id}", response_model=Dict[str, Any])
-def get_character(character_id: int) -> Dict[str, Any]:
-    """Retrieve a character by ID.
-
-    Args:
-        character_id: The ID of the character.
-
-    Returns:
-        A message confirming the character retrieval along with the character ID.
-    """
-    return {"message": "Character retrieved", "character_id": character_id}
+@router.get("/{character_id}", response_model=CharacterSchema)
+def get_character(character_id: int, db: Session = Depends(get_session)) -> Character:
+    controller = CharacterController(db)
+    character = controller.get_character(character_id)
+    if character is None:
+        raise HTTPException(status_code=404, detail="Character not found")
+    return character
 
 
-@router.put("/{character_id}", response_model=Dict[str, Any])
-def update_character(character_id: int, character: Dict[str, Any]) -> Dict[str, Any]:
-    """Update a character by ID.
+@router.put("/{character_id}", response_model=CharacterSchema)
+def update_character(
+    character_id: int,
+    character_update: CharacterUpdateSchema,
+    db: Session = Depends(get_session),
+) -> Character:
+    controller = CharacterController(db)
+    character = controller.get_character(character_id)
+    if character is None:
+        raise HTTPException(status_code=404, detail="Character not found")
 
-    Args:
-        character_id: The ID of the character to update.
-        character: The updated character data.
+    for field, value in character_update.model_dump(exclude_unset=True).items():
+        setattr(character, field, value)
 
-    Returns:
-        A message confirming the character update along with the character data.
-    """
-    return {
-        "message": "Character updated",
-        "character_id": character_id,
-        "data": character,
-    }
-
-
-@router.delete("/{character_id}", response_model=Dict[str, Any])
-def delete_character(character_id: int) -> Dict[str, Any]:
-    """Delete a character by ID.
-
-    Args:
-        character_id: The ID of the character to delete.
-
-    Returns:
-        A message confirming the successful deletion of the character.
-    """
-    return {"message": "Character deleted successfully", "character_id": character_id}
+    return controller.update_character(character)
 
 
-@router.get("/", response_model=List[Dict[str, Any]])
-def list_characters() -> List[Dict[str, Any]]:
-    """List all characters.
+@router.delete("/{character_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_character(character_id: int, db: Session = Depends(get_session)) -> Response:
+    controller = CharacterController(db)
+    character = controller.get_character(character_id)
+    if character is None:
+        raise HTTPException(status_code=404, detail="Character not found")
 
-    Returns:
-        A list of characters with their IDs and names.
-    """
-    return [
-        {"character_id": 1, "name": "Character A"},
-        {"character_id": 2, "name": "Character B"},
-    ]
+    controller.delete_character(character_id)
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
+@router.get("/", response_model=List[CharacterSchema])
+def list_characters(db: Session = Depends(get_session)) -> List[Character]:
+    controller = CharacterController(db)
+    return controller.list_characters()

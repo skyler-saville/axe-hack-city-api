@@ -1,9 +1,11 @@
 # routers/location_router.py
-from typing import Any, Dict, List
+from typing import List
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends, HTTPException, Response, status
+from sqlalchemy.orm import Session
 
 from ..controllers.location_controller import LocationController
+from ..database.session import get_session
 from ..models.location_model import Location
 from ..schemas.location_schema import (LocationCreateSchema, LocationSchema,
                                        LocationUpdateSchema)
@@ -11,67 +13,53 @@ from ..schemas.location_schema import (LocationCreateSchema, LocationSchema,
 router = APIRouter()
 
 
-@router.post("/", response_model=Dict[str, Any])
-async def create_location(location: Dict[str, Any]) -> Dict[str, Any]:
-    """Create a new location.
-
-    Args:
-        location: The location data.
-
-    Returns:
-        The created location data.
-    """
-    return {"id": 1, "name": location.get("name")}
+@router.post("/", response_model=LocationSchema)
+def create_location(
+    location: LocationCreateSchema, db: Session = Depends(get_session)
+) -> Location:
+    controller = LocationController(db)
+    new_location = Location(**location.model_dump())
+    return controller.create_location(new_location)
 
 
-@router.get("/{location_id}", response_model=Dict[str, Any])
-async def read_location(location_id: int) -> Dict[str, Any]:
-    """Retrieve a location by ID.
-
-    Args:
-        location_id: The ID of the location.
-
-    Returns:
-        The retrieved location data.
-    """
-    return {"id": location_id, "name": "Sample Location"}
+@router.get("/{location_id}", response_model=LocationSchema)
+def read_location(location_id: int, db: Session = Depends(get_session)) -> Location:
+    controller = LocationController(db)
+    location = controller.get_location(location_id)
+    if location is None:
+        raise HTTPException(status_code=404, detail="Location not found")
+    return location
 
 
-@router.put("/{location_id}", response_model=Dict[str, Any])
-async def update_location(location_id: int, location: Dict[str, Any]) -> Dict[str, Any]:
-    """Update a location by ID.
+@router.put("/{location_id}", response_model=LocationSchema)
+def update_location(
+    location_id: int,
+    location_update: LocationUpdateSchema,
+    db: Session = Depends(get_session),
+) -> Location:
+    controller = LocationController(db)
+    location = controller.get_location(location_id)
+    if location is None:
+        raise HTTPException(status_code=404, detail="Location not found")
 
-    Args:
-        location_id: The ID of the location to update.
-        location: The updated location data.
+    for field, value in location_update.model_dump(exclude_unset=True).items():
+        setattr(location, field, value)
 
-    Returns:
-        The updated location data.
-    """
-    return {"id": location_id, "name": location.get("name")}
-
-
-@router.delete("/{location_id}", response_model=Dict[str, Any])
-async def delete_location(location_id: int) -> Dict[str, Any]:
-    """Delete a location by ID.
-
-    Args:
-        location_id: The ID of the location to delete.
-
-    Returns:
-        A message confirming the successful deletion of the location.
-    """
-    return {"detail": "Location deleted successfully"}
+    return controller.update_location(location)
 
 
-@router.get("/", response_model=List[Dict[str, Any]])
-async def list_locations() -> List[Dict[str, Any]]:
-    """List all locations.
+@router.delete("/{location_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_location(location_id: int, db: Session = Depends(get_session)) -> Response:
+    controller = LocationController(db)
+    location = controller.get_location(location_id)
+    if location is None:
+        raise HTTPException(status_code=404, detail="Location not found")
 
-    Returns:
-        A list of locations with their IDs and names.
-    """
-    return [
-        {"id": 1, "name": "Sample Location 1"},
-        {"id": 2, "name": "Sample Location 2"},
-    ]
+    controller.delete_location(location_id)
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
+@router.get("/", response_model=List[LocationSchema])
+def list_locations(db: Session = Depends(get_session)) -> List[Location]:
+    controller = LocationController(db)
+    return controller.list_locations()

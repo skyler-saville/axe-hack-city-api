@@ -1,9 +1,11 @@
 # routers/building_router.py
-from typing import Any, Dict, List
+from typing import List
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends, HTTPException, Response, status
+from sqlalchemy.orm import Session
 
 from ..controllers.building_controller import BuildingController
+from ..database.session import get_session
 from ..models.building_model import Building
 from ..schemas.building_schema import (BuildingCreateSchema, BuildingSchema,
                                        BuildingUpdateSchema)
@@ -11,67 +13,53 @@ from ..schemas.building_schema import (BuildingCreateSchema, BuildingSchema,
 router = APIRouter()
 
 
-@router.post("/", response_model=Dict[str, Any])
-def create_building(building: Dict[str, Any]) -> Dict[str, Any]:
-    """Create a new building.
-
-    Args:
-        building: The building data.
-
-    Returns:
-        A message confirming the building creation along with the building data.
-    """
-    return {"message": "Building created", "data": building}
+@router.post("/", response_model=BuildingSchema)
+def create_building(
+    building: BuildingCreateSchema, db: Session = Depends(get_session)
+) -> Building:
+    controller = BuildingController(db)
+    new_building = Building(**building.model_dump())
+    return controller.create_building(new_building)
 
 
-@router.get("/{building_id}", response_model=Dict[str, Any])
-def get_building(building_id: int) -> Dict[str, Any]:
-    """Retrieve a building by ID.
-
-    Args:
-        building_id: The ID of the building.
-
-    Returns:
-        A message confirming the building retrieval along with the building ID.
-    """
-    return {"message": "Building retrieved", "building_id": building_id}
+@router.get("/{building_id}", response_model=BuildingSchema)
+def get_building(building_id: int, db: Session = Depends(get_session)) -> Building:
+    controller = BuildingController(db)
+    building = controller.get_building(building_id)
+    if building is None:
+        raise HTTPException(status_code=404, detail="Building not found")
+    return building
 
 
-@router.put("/{building_id}", response_model=Dict[str, Any])
-def update_building(building_id: int, building: Dict[str, Any]) -> Dict[str, Any]:
-    """Update a building by ID.
+@router.put("/{building_id}", response_model=BuildingSchema)
+def update_building(
+    building_id: int,
+    building_update: BuildingUpdateSchema,
+    db: Session = Depends(get_session),
+) -> Building:
+    controller = BuildingController(db)
+    building = controller.get_building(building_id)
+    if building is None:
+        raise HTTPException(status_code=404, detail="Building not found")
 
-    Args:
-        building_id: The ID of the building to update.
-        building: The updated building data.
+    for field, value in building_update.model_dump(exclude_unset=True).items():
+        setattr(building, field, value)
 
-    Returns:
-        A message confirming the building update along with the building data.
-    """
-    return {"message": "Building updated", "building_id": building_id, "data": building}
-
-
-@router.delete("/{building_id}", response_model=Dict[str, Any])
-def delete_building(building_id: int) -> Dict[str, Any]:
-    """Delete a building by ID.
-
-    Args:
-        building_id: The ID of the building to delete.
-
-    Returns:
-        A message confirming the successful deletion of the building.
-    """
-    return {"message": "Building deleted successfully", "building_id": building_id}
+    return controller.update_building(building)
 
 
-@router.get("/", response_model=List[Dict[str, Any]])
-def list_buildings() -> List[Dict[str, Any]]:
-    """List all buildings.
+@router.delete("/{building_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_building(building_id: int, db: Session = Depends(get_session)) -> Response:
+    controller = BuildingController(db)
+    building = controller.get_building(building_id)
+    if building is None:
+        raise HTTPException(status_code=404, detail="Building not found")
 
-    Returns:
-        A list of buildings with their IDs and names.
-    """
-    return [
-        {"building_id": 1, "name": "Building A"},
-        {"building_id": 2, "name": "Building B"},
-    ]
+    controller.delete_building(building_id)
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
+@router.get("/", response_model=List[BuildingSchema])
+def list_buildings(db: Session = Depends(get_session)) -> List[Building]:
+    controller = BuildingController(db)
+    return controller.list_buildings()

@@ -1,72 +1,66 @@
 # routers/game_session_router.py
-from typing import Any, Dict, List
+from typing import List
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends, HTTPException, Response, status
+from sqlalchemy.orm import Session
+
+from ..controllers.game_session_controller import GameSessionController
+from ..database.session import get_session
+from ..models.game_session_model import GameSession
+from ..schemas.game_session_schema import (GameSessionCreateSchema,
+                                           GameSessionSchema,
+                                           GameSessionUpdateSchema)
 
 router = APIRouter()
 
 
-@router.post("/", response_model=Dict[str, Any])
-def create_session(session: Dict[str, Any]) -> Dict[str, Any]:
-    """Create a new game session.
-
-    Args:
-        session: The session data.
-
-    Returns:
-        The created session data.
-    """
-    return {"id": 1, "name": session.get("name")}
+@router.post("/", response_model=GameSessionSchema)
+def create_session(
+    session: GameSessionCreateSchema, db: Session = Depends(get_session)
+) -> GameSession:
+    controller = GameSessionController(db)
+    new_session = GameSession(**session.model_dump())
+    return controller.create_session(new_session)
 
 
-@router.get("/{session_id}", response_model=Dict[str, Any])
-def read_session(session_id: int) -> Dict[str, Any]:
-    """Retrieve a game session by ID.
-
-    Args:
-        session_id: The ID of the session.
-
-    Returns:
-        The retrieved session data.
-    """
-    return {"id": session_id, "name": "Sample Session"}
+@router.get("/{session_id}", response_model=GameSessionSchema)
+def read_session(session_id: int, db: Session = Depends(get_session)) -> GameSession:
+    controller = GameSessionController(db)
+    session = controller.get_session(session_id)
+    if session is None:
+        raise HTTPException(status_code=404, detail="Session not found")
+    return session
 
 
-@router.put("/{session_id}", response_model=Dict[str, Any])
-def update_session(session_id: int, session: Dict[str, Any]) -> Dict[str, Any]:
-    """Update a game session by ID.
+@router.put("/{session_id}", response_model=GameSessionSchema)
+def update_session(
+    session_id: int,
+    session_update: GameSessionUpdateSchema,
+    db: Session = Depends(get_session),
+) -> GameSession:
+    controller = GameSessionController(db)
+    session = controller.get_session(session_id)
+    if session is None:
+        raise HTTPException(status_code=404, detail="Session not found")
 
-    Args:
-        session_id: The ID of the session to update.
-        session: The updated session data.
+    for field, value in session_update.model_dump(exclude_unset=True).items():
+        setattr(session, field, value)
 
-    Returns:
-        The updated session data.
-    """
-    return {"id": session_id, "name": session.get("name")}
-
-
-@router.delete("/{session_id}", response_model=Dict[str, Any])
-def delete_session(session_id: int) -> Dict[str, Any]:
-    """Delete a game session by ID.
-
-    Args:
-        session_id: The ID of the session to delete.
-
-    Returns:
-        A message confirming the successful deletion of the session.
-    """
-    return {"detail": "Session deleted successfully"}
+    return controller.update_session(session)
 
 
-@router.get("/", response_model=List[Dict[str, Any]])
-def list_sessions() -> List[Dict[str, Any]]:
-    """List all game sessions.
+@router.delete("/{session_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_session(session_id: int, db: Session = Depends(get_session)) -> Response:
+    controller = GameSessionController(db)
+    session = controller.get_session(session_id)
+    if session is None:
+        raise HTTPException(status_code=404, detail="Session not found")
 
-    Returns:
-        A list of sessions with their IDs and names.
-    """
-    return [
-        {"id": 1, "name": "Sample Session 1"},
-        {"id": 2, "name": "Sample Session 2"},
-    ]
+    controller.delete_session(session_id)
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
+@router.get("/", response_model=List[GameSessionSchema])
+def list_sessions(db: Session = Depends(get_session)) -> List[GameSession]:
+    controller = GameSessionController(db)
+    return controller.list_sessions()
