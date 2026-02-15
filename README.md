@@ -1,3 +1,24 @@
+## Database Bootstrap (Canonical Path)
+
+The canonical schema source of truth is the SQLAlchemy ORM models in `axe_hack_city/models/`.
+
+On API startup, `axe_hack_city/main.py` calls `initialize_database()` from
+`axe_hack_city/database/bootstrap.py`, which:
+
+1. Loads all model modules so their tables are registered on shared metadata.
+2. Creates tables with `Base.metadata.create_all(bind=engine)`.
+
+### What to use
+- Use `initialize_database()` for local/bootstrap table creation.
+- Keep schema definitions in SQLAlchemy models.
+- If/when migrations are introduced, they should become the only schema evolution path.
+
+### What not to use
+- Do **not** use legacy raw-SQL bootstrap scripts. The previous
+  `axe_hack_city/database/create_tables.py` path was removed to avoid schema drift.
+
+---
+
 ## Interconnections Between Files
 
 This section outlines how different files within the project interact to handle API requests and manage data flow. Each component has a specific role in maintaining a clean architecture and ensuring separation of concerns.

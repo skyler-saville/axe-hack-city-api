@@ -6,7 +6,7 @@ from typing import Any, List, Type
 from pydantic import BaseModel
 
 from ..config.settings import settings
-from .create_tables import create_tables
+from .bootstrap import initialize_database
 
 
 class SQLiteRepository:
@@ -15,9 +15,7 @@ class SQLiteRepository:
         self.create_tables()
 
     def create_tables(self):
-        # Use the imported create_tables function to create the necessary tables
-        with sqlite3.connect(self.db_path) as conn:
-            create_tables(conn)
+        initialize_database()
 
     def create(self, model: Type[BaseModel]) -> BaseModel:
         with sqlite3.connect(self.db_path) as conn:
