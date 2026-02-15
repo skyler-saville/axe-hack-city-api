@@ -1,26 +1,20 @@
-# models/floor_model.py
 from sqlalchemy import Column, ForeignKey, Integer
-from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 
-Base = declarative_base()
+from .base import Base
 
 
 class Floor(Base):
-    """Represents a floor within a building.
-
-    Attributes:
-        id (int): Unique identifier for the floor.
-        number (int): Floor number.
-        layout_id (int): ID of the associated layout.
-    """
-
     __tablename__ = "floors"
 
     id: int = Column(Integer, primary_key=True, index=True)
     number: int = Column(Integer)
     layout_id: int = Column(Integer, ForeignKey("floor_layouts.id"))
+    building_id: int = Column(Integer, ForeignKey("buildings.id"))
 
-    layout = relationship("FloorLayout", back_populates="floor")
+    layout = relationship("FloorLayout", back_populates="floors")
+    building = relationship("Building", back_populates="floors")
     loot = relationship("Item", back_populates="floor")
     npcs = relationship("NPC", back_populates="floor")
+    walls = relationship("Wall", back_populates="floor")
+    doors = relationship("Door", back_populates="floor")

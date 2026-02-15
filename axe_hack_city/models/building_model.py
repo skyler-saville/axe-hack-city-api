@@ -1,21 +1,10 @@
-# models/building_model.py
 from sqlalchemy import Column, Integer, String
-from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 
-Base = declarative_base()
+from .base import Base, building_entrance_association, building_street_association
 
 
 class Building(Base):
-    """Represents a building in the game.
-
-    Attributes:
-        id (int): Unique identifier for the building.
-        name (str): Name of the building.
-        type (str): Type of the building.
-        description (str): Description of the building.
-    """
-
     __tablename__ = "buildings"
 
     id: int = Column(Integer, primary_key=True, index=True)
@@ -23,8 +12,16 @@ class Building(Base):
     type: str = Column(String)
     description: str = Column(String)
 
-    # Relationships
     floors = relationship("Floor", back_populates="building")
-    entrances = relationship("Location", back_populates="connected_buildings")
+    entrances = relationship(
+        "Location",
+        secondary=building_entrance_association,
+        back_populates="connected_buildings",
+    )
+    connected_streets = relationship(
+        "Street",
+        secondary=building_street_association,
+        back_populates="connected_buildings",
+    )
     loot = relationship("Item", back_populates="building")
     npcs = relationship("NPC", back_populates="building")

@@ -1,21 +1,10 @@
-# models/floor_layout_model.py
 from sqlalchemy import ARRAY, Column, Float, ForeignKey, Integer
-from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 
-Base = declarative_base()
+from .base import Base
 
 
 class Wall(Base):
-    """Represents a wall in a floor layout.
-
-    Attributes:
-        id (int): Unique identifier for the wall.
-        start (list[float]): Starting coordinates of the wall.
-        end (list[float]): Ending coordinates of the wall.
-        floor_id (int): ID of the associated floor.
-    """
-
     __tablename__ = "walls"
 
     id: int = Column(Integer, primary_key=True, index=True)
@@ -27,15 +16,6 @@ class Wall(Base):
 
 
 class Door(Base):
-    """Represents a door in a floor layout.
-
-    Attributes:
-        id (int): Unique identifier for the door.
-        position (list[float]): Position of the door.
-        width (float): Width of the door.
-        floor_id (int): ID of the associated floor.
-    """
-
     __tablename__ = "doors"
 
     id: int = Column(Integer, primary_key=True, index=True)
@@ -47,14 +27,7 @@ class Door(Base):
 
 
 class FloorLayout(Base):
-    """Represents a layout of a floor, including walls and doors.
-
-    Attributes:
-        id (int): Unique identifier for the floor layout.
-    """
-
     __tablename__ = "floor_layouts"
 
     id: int = Column(Integer, primary_key=True, index=True)
-    walls = relationship("Wall", back_populates="floor")
-    doors = relationship("Door", back_populates="floor")
+    floors = relationship("Floor", back_populates="layout")
