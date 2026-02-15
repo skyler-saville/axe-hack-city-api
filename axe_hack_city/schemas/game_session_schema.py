@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Any, Dict, List, Optional
 
 from sqlmodel import Field, SQLModel
 
@@ -23,3 +23,15 @@ class GameSessionUpdateSchema(SQLModel):
 
     name: Optional[str] = None
     status: Optional[str] = None
+
+
+class GameplayCommandRequestSchema(SQLModel):
+    command: str
+
+
+class GameplayActionResultSchema(SQLModel):
+    state_changes: Dict[str, Any] = Field(default_factory=dict)
+    narration: str
+    warnings: List[str] = Field(default_factory=list)
+    errors: List[str] = Field(default_factory=list)
+    success: bool

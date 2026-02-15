@@ -1,4 +1,3 @@
-# routers/game_session_router.py
 from typing import List
 
 from fastapi import APIRouter, Depends, HTTPException, Response, status
@@ -7,9 +6,13 @@ from sqlalchemy.orm import Session
 from ..controllers.game_session_controller import GameSessionController
 from ..database.session import get_session
 from ..models.game_session_model import GameSession
-from ..schemas.game_session_schema import (GameSessionCreateSchema,
-                                           GameSessionSchema,
-                                           GameSessionUpdateSchema)
+from ..schemas.game_session_schema import (
+    GameSessionCreateSchema,
+    GameplayActionResultSchema,
+    GameplayCommandRequestSchema,
+    GameSessionSchema,
+    GameSessionUpdateSchema,
+)
 
 router = APIRouter()
 
@@ -39,14 +42,34 @@ def update_session(
     db: Session = Depends(get_session),
 ) -> GameSession:
     controller = GameSessionController(db)
-    session = controller.get_session(session_id)
+    session = controller.update_session_fields(
+        session_id, session_update.model_dump(exclude_unset=True)
+    )
     if session is None:
         raise HTTPException(status_code=404, detail="Session not found")
 
-    for field, value in session_update.model_dump(exclude_unset=True).items():
-        setattr(session, field, value)
+    return session
 
-    return controller.update_session(session)
+
+@router.post("/{session_id}/commands", response_model=GameplayActionResultSchema)
+def execute_session_command(
+    session_id: int,
+    payload: GameplayCommandRequestSchema,
+    db: Session = Depends(get_session),
+) -> GameplayActionResultSchema:
+    controller = GameSessionController(db)
+
+    if controller.get_session(session_id) is None:
+        raise HTTPException(status_code=404, detail="Session not found")
+
+    result = controller.execute_player_command(session_id=session_id, command=payload.command)
+    return GameplayActionResultSchema(
+        state_changes=result.state_changes,
+        narration=result.narration,
+        warnings=result.warnings,
+        errors=result.errors,
+        success=result.success,
+    )
 
 
 @router.delete("/{session_id}", status_code=status.HTTP_204_NO_CONTENT)
