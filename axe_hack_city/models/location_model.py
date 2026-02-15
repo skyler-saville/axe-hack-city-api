@@ -1,16 +1,16 @@
-# models/location_model.py
 from enum import Enum
 
-from sqlalchemy import ARRAY, Column, Float, ForeignKey, Integer, String
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy import ARRAY, Column, Enum as SqlEnum, Float, Integer, String
 from sqlalchemy.orm import relationship
 
-Base = declarative_base()
+from .base import (
+    Base,
+    building_entrance_association,
+    location_connection_association,
+)
 
 
 class LocationType(str, Enum):
-    """Enumeration of possible location types."""
-
     street = "street"
     building = "building"
     safe_zone = "safe_zone"
@@ -18,23 +18,31 @@ class LocationType(str, Enum):
 
 
 class Location(Base):
-    """Represents a location in the game.
-
-    Attributes:
-        id (int): Unique identifier for the location.
-        name (str): Name of the location.
-        type (LocationType): Type of the location.
-        description (str): Description of the location.
-        coordinates (list[float]): Geographical coordinates of the location.
-    """
-
     __tablename__ = "locations"
 
     id: int = Column(Integer, primary_key=True, index=True)
     name: str = Column(String)
-    type: LocationType = Column(Enum(LocationType))
+    type: LocationType = Column(SqlEnum(LocationType))
     description: str = Column(String)
     coordinates: list[float] = Column(ARRAY(Float))
 
-    connected_locations = relationship("Location", back_populates="entrances")
+    connected_locations = relationship(
+        "Location",
+        secondary=location_connection_association,
+        primaryjoin=id == location_connection_association.c.from_location_id,
+        secondaryjoin=id == location_connection_association.c.to_location_id,
+        back_populates="entrances",
+    )
+    entrances = relationship(
+        "Location",
+        secondary=location_connection_association,
+        primaryjoin=id == location_connection_association.c.to_location_id,
+        secondaryjoin=id == location_connection_association.c.from_location_id,
+        back_populates="connected_locations",
+    )
+    connected_buildings = relationship(
+        "Building",
+        secondary=building_entrance_association,
+        back_populates="entrances",
+    )
     events = relationship("Event", back_populates="location")

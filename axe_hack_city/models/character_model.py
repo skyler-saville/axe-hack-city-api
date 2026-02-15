@@ -1,33 +1,18 @@
-# models/character_model.py
-from enum import Enum
+from enum import Enum as PyEnum
 
-from sqlalchemy import ARRAY, Column, ForeignKey, Integer, String
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy import ARRAY, Column, Enum, ForeignKey, Integer, String
 from sqlalchemy.orm import relationship
 
-Base = declarative_base()
+from .base import Base, event_participant_association
 
 
-class SkillType(Enum):
-    """Enumeration of possible skill types."""
-
-    # Add the skill types here
+class SkillType(PyEnum):
+    hacking = "hacking"
+    engineering = "engineering"
+    combat = "combat"
 
 
 class Character(Base):
-    """Represents a character in the game.
-
-    Attributes:
-        id (int): Unique identifier for the character.
-        name (str): Name of the character.
-        health (int): Health points of the character.
-        xp (int): Experience points of the character.
-        clan_name (str): Name of the clan the character belongs to.
-        clan_members (list[int]): List of clan member IDs.
-        skill_tree (SkillType): Type of skill the character possesses.
-        inventory_id (int): ID of the associated inventory.
-    """
-
     __tablename__ = "characters"
 
     id: int = Column(Integer, primary_key=True, index=True)
@@ -40,3 +25,11 @@ class Character(Base):
     inventory_id: int = Column(Integer, ForeignKey("inventories.id"))
 
     inventory = relationship("Inventory", back_populates="characters")
+    events = relationship(
+        "Event",
+        secondary=event_participant_association,
+        back_populates="participants",
+    )
+    progression = relationship(
+        "PlayerProgression", back_populates="character", uselist=False
+    )

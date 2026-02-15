@@ -1,16 +1,12 @@
-# models/npc_model.py
 from enum import Enum
 
-from sqlalchemy import Column, ForeignKey, Integer, String
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy import Column, Enum as SqlEnum, ForeignKey, Integer, String
 from sqlalchemy.orm import relationship
 
-Base = declarative_base()
+from .base import Base
 
 
 class AggressionLevel(str, Enum):
-    """Enumeration of possible aggression levels for NPCs."""
-
     passive = "passive"
     cautious = "cautious"
     aggressive = "aggressive"
@@ -18,22 +14,22 @@ class AggressionLevel(str, Enum):
 
 
 class Relationship(str, Enum):
-    """Enumeration of possible relationships for NPCs."""
-
     ally = "ally"
     enemy = "enemy"
     neutral = "neutral"
 
 
 class NPC(Base):
-    """Represents a non-playable character (NPC) in the game.
-
-    Attributes:
-        id (int): Unique identifier for the NPC.
-        name (str): Name of the NPC.
-    """
-
     __tablename__ = "npcs"
 
     id: int = Column(Integer, primary_key=True, index=True)
     name: str = Column(String)
+    aggression_level: AggressionLevel = Column(SqlEnum(AggressionLevel), nullable=True)
+    building_id: int = Column(Integer, ForeignKey("buildings.id"), nullable=True)
+    floor_id: int = Column(Integer, ForeignKey("floors.id"), nullable=True)
+    faction_id: int = Column(Integer, ForeignKey("factions.id"), nullable=True)
+
+    building = relationship("Building", back_populates="npcs")
+    floor = relationship("Floor", back_populates="npcs")
+    faction = relationship("Faction", back_populates="npcs")
+    missions = relationship("Mission", back_populates="giver")

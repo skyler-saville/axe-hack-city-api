@@ -1,21 +1,10 @@
-# models/faction_model.py
 from sqlalchemy import Column, Integer, String
-from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 
-Base = declarative_base()
+from .base import Base, faction_alliance_association
 
 
 class Faction(Base):
-    """Represents a faction in the game.
-
-    Attributes:
-        id (int): Unique identifier for the faction.
-        name (str): Name of the faction.
-        description (str): Description of the faction.
-        reputation (int): Reputation score of the faction.
-    """
-
     __tablename__ = "factions"
 
     id: int = Column(Integer, primary_key=True, index=True)
@@ -23,6 +12,18 @@ class Faction(Base):
     description: str = Column(String)
     reputation: int = Column(Integer)
 
-    allies = relationship("Faction", back_populates="enemies")
-    enemies = relationship("Faction", back_populates="allies")
+    allies = relationship(
+        "Faction",
+        secondary=faction_alliance_association,
+        primaryjoin=id == faction_alliance_association.c.faction_id,
+        secondaryjoin=id == faction_alliance_association.c.ally_id,
+        back_populates="enemies",
+    )
+    enemies = relationship(
+        "Faction",
+        secondary=faction_alliance_association,
+        primaryjoin=id == faction_alliance_association.c.ally_id,
+        secondaryjoin=id == faction_alliance_association.c.faction_id,
+        back_populates="allies",
+    )
     npcs = relationship("NPC", back_populates="faction")

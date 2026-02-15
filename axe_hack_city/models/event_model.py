@@ -1,23 +1,10 @@
-# models/event_model.py
 from sqlalchemy import Column, DateTime, ForeignKey, Integer, String
-from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 
-Base = declarative_base()
+from .base import Base, event_participant_association
 
 
 class Event(Base):
-    """Represents an event in the game.
-
-    Attributes:
-        id (int): Unique identifier for the event.
-        name (str): Name of the event.
-        description (str): Description of the event.
-        location_id (int): ID of the associated location.
-        start_time (DateTime): Start time of the event.
-        end_time (DateTime): End time of the event.
-    """
-
     __tablename__ = "events"
 
     id: int = Column(Integer, primary_key=True, index=True)
@@ -28,4 +15,8 @@ class Event(Base):
     end_time: DateTime = Column(DateTime)
 
     location = relationship("Location", back_populates="events")
-    participants = relationship("Character", back_populates="events")
+    participants = relationship(
+        "Character",
+        secondary=event_participant_association,
+        back_populates="events",
+    )
