@@ -6,7 +6,15 @@ sys.path.append(str(Path(__file__).resolve().parent))
 
 from fastapi import FastAPI
 
+from .database.bootstrap import initialize_database
+
 app = FastAPI()
+
+
+@app.on_event("startup")
+def bootstrap_database() -> None:
+    initialize_database()
+
 
 # Importing routers
 from .routers.authentication_router import router as authentication_router
