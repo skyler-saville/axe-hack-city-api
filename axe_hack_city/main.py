@@ -26,6 +26,7 @@ from .routers.faction_router import router as faction_router
 from .routers.floor_layout_router import router as floor_layout_router
 from .routers.floor_router import router as floor_router
 from .routers.game_session_router import router as game_session_router
+from .routers.gameplay_router import router as gameplay_router
 from .routers.inventory_router import router as inventory_router
 from .routers.item_router import router as item_router
 from .routers.location_router import router as location_router
@@ -37,6 +38,7 @@ from .routers.user_router import router as user_router
 
 # Including routers with prefixes and tags
 app.include_router(game_session_router, prefix="/api/sessions", tags=["game sessions"])
+app.include_router(gameplay_router, prefix="/api/sessions", tags=["gameplay"])
 app.include_router(authentication_router, prefix="/api/auth", tags=["authentication"])
 app.include_router(user_router, prefix="/api/users", tags=["users"])
 app.include_router(inventory_router, prefix="/api/inventories", tags=["inventories"])
