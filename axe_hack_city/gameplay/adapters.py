@@ -3,6 +3,7 @@ from typing import Protocol
 from sqlalchemy.orm import Session
 
 from ..models.game_session_model import GameSession
+from ..services.game_session_state_service import GameSessionStateService
 from .types import DispatchContext
 
 
@@ -37,8 +38,6 @@ class SQLAlchemyGameplayAdapter:
         if session is None:
             raise ValueError("Session not found")
 
-        status = state_changes.get("status")
-        if isinstance(status, str):
-            session.status = status
-
+        transition = GameSessionStateService.transition_from_state_changes(state_changes)
+        GameSessionStateService.apply_validated_transition(session, transition)
         self.db_session.commit()

@@ -22,7 +22,9 @@ def create_session(
     session: GameSessionCreateSchema, db: Session = Depends(get_session)
 ) -> GameSession:
     controller = GameSessionController(db)
-    new_session = GameSession(**session.model_dump())
+    session_data = session.model_dump(exclude={"state"})
+    session_data.update(session.state.model_dump())
+    new_session = GameSession(**session_data)
     return controller.create_session(new_session)
 
 
@@ -42,9 +44,12 @@ def update_session(
     db: Session = Depends(get_session),
 ) -> GameSession:
     controller = GameSessionController(db)
-    session = controller.update_session_fields(
-        session_id, session_update.model_dump(exclude_unset=True)
-    )
+    try:
+        session = controller.update_session_fields(
+            session_id, session_update.model_dump(exclude_unset=True)
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
     if session is None:
         raise HTTPException(status_code=404, detail="Session not found")
 
