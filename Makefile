@@ -1,39 +1,44 @@
 PROJECT_NAME = $(shell basename $(CURDIR))
 PROJECT_DIR := $(CURDIR)/axe_hack_city
 PYTHON_FILES := $(shell find $(PROJECT_DIR) -name '*.py')
+POETRY ?= $(HOME)/.local/bin/poetry
+
+ifeq ($(wildcard $(POETRY)),)
+POETRY := poetry
+endif
 
 .PHONY: install install-dev update sync freeze export-requirements clean dev run \
 	docker-build docker-run docker-stop docker-restart docker-remove docker-delete \
 	sort format lint add_imports comment
 
 install:
-	@poetry install
+	@$(POETRY) install
 
 install-dev:
-	@poetry add --group dev -r .dev-requirements.txt
+	@$(POETRY) add --group dev -r .dev-requirements.txt
 
 update:
-	@poetry update
+	@$(POETRY) update
 
 sync:
-	@poetry run python bin/package_sync.py
+	@$(POETRY) run python bin/package_sync.py
 
 freeze:
-	@poetry lock
+	@$(POETRY) lock
 
 # Optional compatibility export for tooling that still requires pip-style requirements files.
 export-requirements:
-	@poetry export --without dev --without-hashes -f requirements.txt --output requirements.txt
-	@poetry export --only dev --without-hashes -f requirements.txt --output requirements-dev.txt
+	@$(POETRY) export --without dev --without-hashes -f requirements.txt --output requirements.txt
+	@$(POETRY) export --only dev --without-hashes -f requirements.txt --output requirements-dev.txt
 
 clean:
 	@find $(PROJECT_DIR) -name '__pycache__' -exec rm -rf {} \;
 
 dev:
-	@poetry run uvicorn $(PROJECT_NAME).main:app --host 0.0.0.0 --port 8000 --reload
+	@$(POETRY) run uvicorn $(PROJECT_NAME).main:app --host 0.0.0.0 --port 8000 --reload
 
 run:
-	@poetry run $(PROJECT_NAME)
+	@$(POETRY) run $(PROJECT_NAME)
 
 # Docker targets (use PROJECT_NAME variable from .env)
 docker-build:
@@ -55,13 +60,13 @@ docker-delete:
 	./bin/env_utils.sh delete
 
 sort:
-	@poetry run isort $(PYTHON_FILES)
+	@$(POETRY) run isort $(PYTHON_FILES)
 
 format:
-	@poetry run black $(PYTHON_FILES)
+	@$(POETRY) run black $(PYTHON_FILES)
 
 lint:
-	@poetry run pylint $(PYTHON_FILES)
+	@$(POETRY) run pylint $(PYTHON_FILES)
 
 add_imports:
 	./bin/add_imports.sh $(PROJECT_DIR)
