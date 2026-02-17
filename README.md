@@ -66,17 +66,43 @@ Use this path when you just want to run the API quickly.
 
 Use this path when you want the full service stack: API + Postgres + Redis + MinIO.
 
-1. **Start core services**
+1. **Create `.env` from the template**
+   ```bash
+   cp .env.example .env
+   ```
+
+2. **Start core services (base + default override)**
    ```bash
    docker compose up --build
    ```
+   Docker Compose automatically layers:
+   - `docker-compose.yml` (base services)
+   - `docker-compose.override.yml` (local/dev defaults)
 
-2. **(Optional) include pgAdmin UI**
+3. **Use cascading override files for specific scenarios**
+   ```bash
+   # Include pgAdmin without using profiles
+   docker compose \
+     -f docker-compose.yml \
+     -f docker-compose.override.yml \
+     -f docker-compose.admin.override.yml \
+     up --build
+
+   # CI-like run (no autoreload command)
+   docker compose \
+     -f docker-compose.yml \
+     -f docker-compose.override.yml \
+     -f docker-compose.ci.override.yml \
+     up --build
+   ```
+   All compose files consume the same `.env` values, so port/credential changes are centralized.
+
+4. **(Optional) include pgAdmin UI via profile**
    ```bash
    docker compose --profile admin up --build
    ```
 
-3. **Service endpoints**
+5. **Service endpoints**
    - API: `http://localhost:8000`
    - API docs: `http://localhost:8000/docs`
    - Postgres: `localhost:5432`
@@ -85,7 +111,7 @@ Use this path when you want the full service stack: API + Postgres + Redis + Min
    - MinIO Console: `http://localhost:9001`
    - pgAdmin (admin profile): `http://localhost:5050`
 
-4. **Stop services**
+6. **Stop services**
    ```bash
    docker compose down
    ```
