@@ -12,6 +12,10 @@ class Settings(BaseSettings):
     database_url: str = f"sqlite:///{DEFAULT_DB_PATH}"
     environment: str = "development"
 
+    jwt_secret_key: str = "change-me"
+    jwt_algorithm: str = "HS256"
+    access_token_expire_minutes: int = 30
+
     minio_endpoint: str = "localhost:9000"
     minio_access_key: str = "minioadmin"
     minio_secret_key: str = "minioadmin"
