@@ -1,6 +1,6 @@
 from enum import Enum as PyEnum
 
-from sqlalchemy import ARRAY, Column, Enum, Integer, String
+from sqlalchemy import ARRAY, Boolean, Column, Enum, Integer, String
 
 from .base import Base
 
@@ -21,3 +21,4 @@ class User(Base):
     password: str = Column(String)
     timezone: TimezoneEnum = Column(Enum(TimezoneEnum), default="UTC")
     character_ids: list[int] = Column(ARRAY(Integer))
+    is_active: bool = Column(Boolean, default=True, nullable=False)

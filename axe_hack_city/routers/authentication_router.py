@@ -1,30 +1,18 @@
-# routers/authentication_router.py
+from datetime import timedelta
 from typing import Dict, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from pydantic import BaseModel
+from sqlalchemy.orm import Session
 
-# Create an APIRouter instance
+from ..config.settings import settings
+from ..controllers.user_controller import UserController
+from ..database.session import get_session
+from ..models.user_model import User as UserModel
+from ..services.auth_service import create_access_token, decode_access_token, verify_password
+
 router = APIRouter()
-
-# Fake user database
-fake_users_db: Dict[str, Dict[str, Optional[str]]] = {
-    "johndoe": {
-        "username": "johndoe",
-        "full_name": "John Doe",
-        "email": "johndoe@example.com",
-        "hashed_password": "fakehashedsecret",
-        "disabled": False,
-    },
-    "alice": {
-        "username": "alice",
-        "full_name": "Alice Wonderson",
-        "email": "alice@example.com",
-        "hashed_password": "fakehashedsecret2",
-        "disabled": True,
-    },
-}
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
@@ -44,36 +32,39 @@ class UserInDB(User):
     hashed_password: str
 
 
-def fake_hash_password(password: str) -> str:
-    """Fake password hashing function."""
-    return "fakehashed" + password
+def _to_user_response(user: UserModel) -> User:
+    return User(username=user.username, disabled=not getattr(user, "is_active", True))
 
 
-def get_user(
-    db: Dict[str, Dict[str, Optional[str]]], username: str
-) -> Optional[UserInDB]:
-    """Retrieve a user from the database."""
-    user_dict = db.get(username)
-    if user_dict:
-        return UserInDB(**user_dict)
-    return None
+def _load_user_by_username(db: Session, username: str) -> Optional[UserModel]:
+    controller = UserController(db)
+    users = controller.list_users(username=username)
+    if not users:
+        return None
+    return users[0]
 
 
-def fake_decode_token(token: str) -> Optional[UserInDB]:
-    """Fake token decoder."""
-    return get_user(fake_users_db, token)
+async def get_current_user(
+    token: str = Depends(oauth2_scheme), db: Session = Depends(get_session)
+) -> User:
+    """Get the current user based on the provided JWT token."""
+    token_payload = decode_access_token(token)
+    username = token_payload.get("sub")
+    if not username:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid authentication credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
 
-
-async def get_current_user(token: str = Depends(oauth2_scheme)) -> UserInDB:
-    """Get the current user based on the provided token."""
-    user = fake_decode_token(token)
+    user = _load_user_by_username(db, username)
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid authentication credentials",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    return user
+    return _to_user_response(user)
 
 
 async def get_current_active_user(
@@ -86,18 +77,23 @@ async def get_current_active_user(
 
 
 @router.post("/token")
-async def login(form_data: OAuth2PasswordRequestForm = Depends()) -> Dict[str, str]:
-    """Login endpoint to obtain access tokens."""
-    user_dict = fake_users_db.get(form_data.username)
-    if not user_dict:
+async def login(
+    form_data: OAuth2PasswordRequestForm = Depends(),
+    db: Session = Depends(get_session),
+) -> Dict[str, str]:
+    """Login endpoint to obtain JWT access tokens."""
+    user = _load_user_by_username(db, form_data.username)
+    if not user:
         raise HTTPException(status_code=400, detail="Incorrect username or password")
 
-    user = UserInDB(**user_dict)
-    hashed_password = fake_hash_password(form_data.password)
-    if hashed_password != user.hashed_password:
+    if not verify_password(form_data.password, user.password):
         raise HTTPException(status_code=400, detail="Incorrect username or password")
 
-    return {"access_token": user.username, "token_type": "bearer"}
+    access_token_expires = timedelta(minutes=settings.access_token_expire_minutes)
+    access_token = create_access_token(
+        data={"sub": user.username}, expires_delta=access_token_expires
+    )
+    return {"access_token": access_token, "token_type": "bearer"}
 
 
 @router.get("/users/me", response_model=User)
