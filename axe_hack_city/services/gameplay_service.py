@@ -46,6 +46,7 @@ class GameplaySessionService:
 
         return GameplayTurnOutcomeSchema(
             narration=result.narration,
+            state_version=session.state_version,
             state_delta=result.state_changes,
             ui_hints=self._derive_ui_hints(result.state_changes, result.narration),
             warnings=result.warnings,

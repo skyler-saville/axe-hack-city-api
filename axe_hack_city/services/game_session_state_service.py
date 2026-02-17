@@ -32,11 +32,15 @@ class GameSessionStateService:
 
     @staticmethod
     def apply_validated_transition(session: GameSession, transition: GameStateTransitionSchema) -> None:
+        current_state_version = session.state_version
         if (
             transition.expected_state_version is not None
-            and transition.expected_state_version != session.state_version
+            and transition.expected_state_version != current_state_version
         ):
-            raise ValueError("State version mismatch for transition")
+            raise ValueError(
+                "State version mismatch for transition "
+                f"(expected={transition.expected_state_version}, actual={current_state_version})"
+            )
 
         if transition.status is not None:
             session.status = transition.status
@@ -76,3 +80,4 @@ class GameSessionStateService:
             "turn_metadata": session.turn_metadata,
             "action_log_summary": session.action_log_summary,
         }
+        session.state_version = current_state_version + 1
