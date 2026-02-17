@@ -3,7 +3,7 @@ requires = [ "poetry-core",]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
-name = "test"
+name = "axe-hack-city"
 version = "0.1.0"
 description = "A FastAPI backend for a text-based game"
 authors = [ "Skyler Saville <skylersaville@gmail.com>",]
@@ -18,7 +18,14 @@ packaging = "^24.1"
 pydantic-settings = "^2.5.2"
 email-validator = "^2.2.0"
 python-multipart = "^0.0.12"
-poetry-plugin-export = "^1.8.0"
+sqlalchemy = "^2.0.35"
+sqlalchemy-utils = "^0.41.2"
+sqlite-utils = "^3.37"
+databases = "^0.9.0"
+aiosqlite = "^0.20.0"
+sqlmodel = "^0.0.22"
+fastapi = "^0.115.0"
+uvicorn = "^0.30.6"
 
 
 [tool.poetry.group.dev.dependencies]
@@ -33,15 +40,4 @@ bandit = "^1.7.9"
 safety = "^3.2.7"
 coverage = "^7.6.1"
 toml = "^0.10.2"
-
-[tool.poetry.group.sql-common.dependencies]
-sqlalchemy = "^2.0.35"
-sqlalchemy-utils = "^0.41.2"
-sqlite-utils = "^3.37"
-databases = "^0.9.0"
-aiosqlite = "^0.20.0"
-sqlmodel = "^0.0.22"
-
-[tool.poetry.group.rest.dependencies]
-fastapi = "^0.115.0"
-uvicorn = "^0.30.6"
+poetry-plugin-export = "^1.8.0"
