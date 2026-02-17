@@ -33,6 +33,7 @@ Use this path when you just want to run the API quickly.
    ```bash
    cp .env.example .env
    ```
+   Keep `.env` local-only (it is ignored by git) and commit updates to `.env.example` instead.
    If `.env.example` is not present, create `.env` manually with at least:
    ```env
    DATABASE_URL=sqlite:///axe_hack_city/app.db
