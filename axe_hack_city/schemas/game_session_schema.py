@@ -46,6 +46,7 @@ class GameSessionSchema(SQLModel):
     """Schema for representing a game session."""
 
     id: Optional[int] = None
+    owner_user_id: int
     name: str
     status: str
     player_context: Dict[str, Any] = Field(default_factory=dict)

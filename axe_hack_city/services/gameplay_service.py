@@ -23,9 +23,12 @@ class GameplaySessionService:
         self.command_service = GameplayService(SQLAlchemyGameplayAdapter(db_session))
 
     def submit_command(
-        self, session_id: int, payload: GameplayCommandInputSchema
+        self,
+        session_id: int,
+        payload: GameplayCommandInputSchema,
+        current_user_id: int,
     ) -> GameplayTurnOutcomeSchema:
-        session = self._get_session_or_raise(session_id)
+        session = self._get_session_or_raise(session_id, current_user_id)
         raw_command = self._resolve_raw_command(payload)
         result = self.command_service.execute(session_id=session_id, raw_input=raw_command)
 
@@ -50,8 +53,10 @@ class GameplaySessionService:
             success=result.success,
         )
 
-    def get_state_snapshot(self, session_id: int) -> GameplayStateSnapshotSchema:
-        session = self._get_session_or_raise(session_id)
+    def get_state_snapshot(
+        self, session_id: int, current_user_id: int
+    ) -> GameplayStateSnapshotSchema:
+        session = self._get_session_or_raise(session_id, current_user_id)
         turn_metadata = session.turn_metadata or {}
         return GameplayStateSnapshotSchema(
             session_id=session.id,
@@ -63,8 +68,10 @@ class GameplaySessionService:
             state_payload=session.state_payload or {},
         )
 
-    def get_recent_log(self, session_id: int, limit: int = 20) -> GameplayLogResponseSchema:
-        session = self._get_session_or_raise(session_id)
+    def get_recent_log(
+        self, session_id: int, current_user_id: int, limit: int = 20
+    ) -> GameplayLogResponseSchema:
+        session = self._get_session_or_raise(session_id, current_user_id)
         summary = session.action_log_summary or {}
         entries = summary.get("entries", [])
         selected_entries = entries[-limit:]
@@ -140,8 +147,8 @@ class GameplaySessionService:
         self.db_session.add(session)
         self.db_session.commit()
 
-    def _get_session_or_raise(self, session_id: int) -> GameSession:
+    def _get_session_or_raise(self, session_id: int, current_user_id: int) -> GameSession:
         session = self.db_session.get(GameSession, session_id)
-        if session is None:
+        if session is None or session.owner_user_id != current_user_id:
             raise ValueError("Session not found")
         return session

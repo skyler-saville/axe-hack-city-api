@@ -9,7 +9,8 @@ from axe_hack_city.services.auth_service import create_access_token, hash_passwo
 
 
 class DummyUser:
-    def __init__(self, username: str, password: str, is_active: bool = True) -> None:
+    def __init__(self, username: str, password: str, is_active: bool = True, user_id: int = 1) -> None:
+        self.id = user_id
         self.username = username
         self.password = password
         self.is_active = is_active

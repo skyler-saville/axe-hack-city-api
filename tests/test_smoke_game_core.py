@@ -1,5 +1,3 @@
-from pathlib import Path
-
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
@@ -24,20 +22,21 @@ def test_smoke_game_session_and_gameplay_flow(tmp_path) -> None:
 
     try:
         created_session = controller.create_session(
-            GameSession(name="Smoke Session", status="ready")
+            GameSession(name="Smoke Session", status="ready", owner_user_id=1)
         )
 
         command_result = gameplay_service.submit_command(
             created_session.id,
             GameplayCommandInputSchema(raw_command="move market"),
+            current_user_id=1,
         )
         assert command_result.success is True
 
-        state = gameplay_service.get_state_snapshot(created_session.id)
+        state = gameplay_service.get_state_snapshot(created_session.id, current_user_id=1)
         assert state.status == "at:market"
         assert state.turn_number == 1
 
-        log = gameplay_service.get_recent_log(created_session.id)
+        log = gameplay_service.get_recent_log(created_session.id, current_user_id=1)
         assert len(log.entries) == 1
         assert log.entries[0].success is True
     finally:
@@ -52,12 +51,13 @@ def test_smoke_gameplay_rejects_invalid_command(tmp_path) -> None:
 
     try:
         created_session = controller.create_session(
-            GameSession(name="Bad Command Session", status="ready")
+            GameSession(name="Bad Command Session", status="ready", owner_user_id=1)
         )
 
         command_result = gameplay_service.submit_command(
             created_session.id,
             GameplayCommandInputSchema(raw_command="dance"),
+            current_user_id=1,
         )
         assert command_result.success is False
         assert len(command_result.parse_errors) > 0
