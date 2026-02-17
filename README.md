@@ -57,6 +57,7 @@ Use this path when you just want to run the API quickly.
    - API root/docs: `http://localhost:8000/docs`
 
 > On startup, the app initializes database tables automatically via `initialize_database()`.
+> The SQLite file is generated at runtime (for local/dev) and should never be committed.
 
 ---
 
@@ -154,6 +155,7 @@ On API startup, `axe_hack_city/main.py` calls `initialize_database()` from
 ### What not to use
 - Do **not** use legacy raw-SQL bootstrap scripts. The previous
   `axe_hack_city/database/create_tables.py` path was removed to avoid schema drift.
+- Do **not** commit generated database artifacts (for example `app.db`); let startup/bootstrap create tables from models.
 
 ---
 
