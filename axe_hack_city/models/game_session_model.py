@@ -7,6 +7,7 @@ class GameSession(Base):
     __tablename__ = "game_sessions"
 
     id: int = Column(Integer, primary_key=True, index=True)
+    owner_user_id: int = Column(Integer, nullable=False, index=True)
     name: str = Column(String)
     status: str = Column(String)
     player_context: dict = Column(JSON, nullable=False, default=dict)

@@ -20,6 +20,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 class User(BaseModel):
     """User model for API responses."""
 
+    id: int
     username: str
     email: Optional[str] = None
     full_name: Optional[str] = None
@@ -33,7 +34,11 @@ class UserInDB(User):
 
 
 def _to_user_response(user: UserModel) -> User:
-    return User(username=user.username, disabled=not getattr(user, "is_active", True))
+    return User(
+        id=user.id,
+        username=user.username,
+        disabled=not getattr(user, "is_active", True),
+    )
 
 
 def _load_user_by_username(db: Session, username: str) -> Optional[UserModel]:
