@@ -42,10 +42,10 @@ class RuntimeGameStateSchema(GameStateEnvelopeSchema):
         return self
 
 
-class GameSessionSchema(SQLModel, table=True):
+class GameSessionSchema(SQLModel):
     """Schema for representing a game session."""
 
-    id: Optional[int] = Field(default=None, primary_key=True)
+    id: Optional[int] = None
     name: str
     status: str
     player_context: Dict[str, Any] = Field(default_factory=dict)
