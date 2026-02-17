@@ -1,3 +1,45 @@
+## Dockerized Development Stack
+
+This project now supports a multi-container setup for local virtualization with Docker Compose.
+
+### Included services
+- **api**: FastAPI backend (`axe_hack_city.main:app`)
+- **postgres**: Primary relational database for concurrent multiplayer workloads
+- **minio**: S3-compatible object storage for assets/HUD media
+- **minio-init**: Creates the default MinIO bucket automatically
+- **redis**: In-memory cache/pub-sub layer for session state and chat fanout
+- **pgadmin** (optional profile): Postgres admin UI
+
+### Quick start
+1. Build and run core stack:
+   ```bash
+   docker compose up --build
+   ```
+2. Run with pgAdmin UI:
+   ```bash
+   docker compose --profile admin up --build
+   ```
+
+### Service endpoints
+- API: `http://localhost:8000`
+- MinIO API: `http://localhost:9000`
+- MinIO Console: `http://localhost:9001`
+- Redis: `localhost:6379`
+- Postgres: `localhost:5432`
+- pgAdmin (profile `admin`): `http://localhost:5050`
+
+### Environment variables
+Set these in `.env` (or rely on docker-compose defaults):
+- `DATABASE_URL`
+- `ENVIRONMENT`
+- `MINIO_ENDPOINT`
+- `MINIO_ACCESS_KEY`
+- `MINIO_SECRET_KEY`
+- `MINIO_BUCKET`
+- `MINIO_SECURE`
+
+---
+
 ## Database Bootstrap (Canonical Path)
 
 The canonical schema source of truth is the SQLAlchemy ORM models in `axe_hack_city/models/`.
@@ -66,3 +108,11 @@ This section outlines how different files within the project interact to handle 
 - **Scalability**: New features and endpoints can be added without significant modifications to existing code.
 
 ---
+
+## Additional container suggestions for MMORPG-scale growth
+- **Nginx or Traefik** for TLS termination, routing, and load balancing across multiple API replicas.
+- **Celery worker + Celery beat** for async/background tasks (combat ticks, world events, notifications).
+- **Prometheus + Grafana** for metrics and dashboards.
+- **Loki + Promtail** (or ELK/OpenSearch) for centralized logs.
+- **Keycloak** (or Authentik) for robust account/session identity management.
+- **RabbitMQ or NATS** if game event throughput outgrows Redis pub/sub.
