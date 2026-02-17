@@ -1,42 +1,138 @@
-## Dockerized Development Stack
+# Axe Hack City API
 
-This project now supports a multi-container setup for local virtualization with Docker Compose.
+Backend API for a text-based game, built with FastAPI + SQLAlchemy.
 
-### Included services
-- **api**: FastAPI backend (`axe_hack_city.main:app`)
-- **postgres**: Primary relational database for concurrent multiplayer workloads
-- **minio**: S3-compatible object storage for assets/HUD media
-- **minio-init**: Creates the default MinIO bucket automatically
-- **redis**: In-memory cache/pub-sub layer for session state and chat fanout
-- **pgadmin** (optional profile): Postgres admin UI
+## Getting Started
 
-### Quick start
-1. Build and run core stack:
+This repository is **backend-only**. It provides API endpoints and game logic, but no frontend/UI code.
+
+### Prerequisites
+
+- Python 3.11+
+- [Poetry](https://python-poetry.org/) (recommended)
+- Docker + Docker Compose (optional, for full local stack)
+
+---
+
+### Option A: Run locally with Python (fastest setup)
+
+Use this path when you just want to run the API quickly.
+
+1. **Clone and enter the repo**
+   ```bash
+   git clone <your-repo-url>
+   cd axe-hack-city-api
+   ```
+
+2. **Install dependencies**
+   ```bash
+   poetry install
+   ```
+
+3. **Create environment file**
+   ```bash
+   cp .env.example .env
+   ```
+   If `.env.example` is not present, create `.env` manually with at least:
+   ```env
+   DATABASE_URL=sqlite:///axe_hack_city/app.db
+   ENVIRONMENT=development
+   MINIO_ENDPOINT=localhost:9000
+   MINIO_ACCESS_KEY=minioadmin
+   MINIO_SECRET_KEY=minioadmin
+   MINIO_BUCKET=axe-hack-city-assets
+   MINIO_SECURE=false
+   ```
+
+4. **Start the API**
+   ```bash
+   make dev
+   ```
+   Or directly:
+   ```bash
+   poetry run uvicorn axe_hack_city.main:app --host 0.0.0.0 --port 8000 --reload
+   ```
+
+5. **Verify it is running**
+   - API root/docs: `http://localhost:8000/docs`
+
+> On startup, the app initializes database tables automatically via `initialize_database()`.
+
+---
+
+### Option B: Run with Docker Compose (full dev stack)
+
+Use this path when you want the full service stack: API + Postgres + Redis + MinIO.
+
+1. **Start core services**
    ```bash
    docker compose up --build
    ```
-2. Run with pgAdmin UI:
+
+2. **(Optional) include pgAdmin UI**
    ```bash
    docker compose --profile admin up --build
    ```
 
-### Service endpoints
-- API: `http://localhost:8000`
-- MinIO API: `http://localhost:9000`
-- MinIO Console: `http://localhost:9001`
-- Redis: `localhost:6379`
-- Postgres: `localhost:5432`
-- pgAdmin (profile `admin`): `http://localhost:5050`
+3. **Service endpoints**
+   - API: `http://localhost:8000`
+   - API docs: `http://localhost:8000/docs`
+   - Postgres: `localhost:5432`
+   - Redis: `localhost:6379`
+   - MinIO API: `http://localhost:9000`
+   - MinIO Console: `http://localhost:9001`
+   - pgAdmin (admin profile): `http://localhost:5050`
 
-### Environment variables
-Set these in `.env` (or rely on docker-compose defaults):
-- `DATABASE_URL`
-- `ENVIRONMENT`
-- `MINIO_ENDPOINT`
-- `MINIO_ACCESS_KEY`
-- `MINIO_SECRET_KEY`
-- `MINIO_BUCKET`
-- `MINIO_SECURE`
+4. **Stop services**
+   ```bash
+   docker compose down
+   ```
+
+---
+
+### Common local workflows
+
+- Run tests:
+  ```bash
+  poetry run pytest
+  ```
+- Format code:
+  ```bash
+  make format
+  ```
+- Lint code:
+  ```bash
+  make lint
+  ```
+
+## Frontend Options (there is no frontend in this repo)
+
+You have several good choices depending on your goals:
+
+1. **Flask + Jinja templates (quickest server-rendered UI)**
+   - Good for: admin tools, simple prototype screens, rapid iteration.
+   - Pros: minimal JS, easy to host with backend.
+   - Cons: less interactive UX for game loops.
+
+2. **React (recommended for game client UX)**
+   - Good for: interactive HUDs, inventory panels, mission/state updates, websockets later.
+   - Pros: rich component ecosystem, scalable architecture.
+   - Cons: separate app/build pipeline.
+
+3. **Next.js (React framework)**
+   - Good for: React UI plus routing, API proxying, and optional SSR.
+   - Pros: production-ready conventions out of the box.
+   - Cons: slightly more framework complexity.
+
+4. **Lightweight HTML/JS client first, upgrade later**
+   - Good for: validating API/gameplay quickly before committing to a full frontend stack.
+   - Pros: lowest initial effort.
+   - Cons: harder to scale as UI complexity grows.
+
+### Practical recommendation
+
+- If your immediate goal is to build a real player-facing interface, start with **React** (or **Next.js** if you want routing/SSR conventions).
+- If your immediate goal is just testing and internal tooling, a **Flask/Jinja** UI is fine as a temporary bridge.
 
 ---
 
