@@ -31,6 +31,8 @@ class SQLAlchemyGameplayAdapter:
         )
 
     def apply_state_changes(self, session_id: int, state_changes: dict) -> None:
+        # No-op transitions are ignored and not persisted, so state_version only advances
+        # when a concrete transition is actually applied.
         if not state_changes:
             return
 

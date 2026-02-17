@@ -38,6 +38,7 @@ class GameplayUiHintsSchema(SQLModel):
 
 class GameplayTurnOutcomeSchema(SQLModel):
     narration: str
+    state_version: int
     state_delta: Dict[str, Any] = Field(default_factory=dict)
     ui_hints: GameplayUiHintsSchema = Field(default_factory=GameplayUiHintsSchema)
     warnings: List[str] = Field(default_factory=list)
