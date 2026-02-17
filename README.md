@@ -96,7 +96,7 @@ Use this path when you want the full service stack: API + Postgres + Redis + Min
 
 - Run tests:
   ```bash
-  poetry run pytest
+  poetry run pytest tests/
   ```
 - Format code:
   ```bash
